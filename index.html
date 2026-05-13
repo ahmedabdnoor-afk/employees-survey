@@ -79,7 +79,7 @@
             h3 { page-break-after: avoid; }
             .form-group:last-child { page-break-after: auto; }
         }
-        @media print and (max-width: 768px) {
+@media print and (max-width: 768px) {
     body {
         font-size: 10pt !important;
     }
@@ -99,10 +99,20 @@
     h3 {
         font-size: 10pt !important;
         margin: 2mm 0 !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
     }
     
     .form-group {
         margin-bottom: 3mm !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    
+    /* منع كسر الصفحة بين المحور التاسع والعاشر */
+    .form-group:last-of-type {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 }
         .pdf-container { width: 100%; margin: 0 auto; }
