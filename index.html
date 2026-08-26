@@ -4,1834 +4,823 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>استبانة قياس الرضا الوظيفي</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
-            --light-green: #e8f5e8;
-            --light-blue: #e3f2fd;
-        }
-
-        * {
-            transition: all 0.3s ease;
-            font-family: "Times New Roman", serif;
-        }
-
-        body {
-            font-family: "Times New Roman", serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 25px;
-            border-bottom: 2px dashed var(--light-color);
-        }
-
-        .header h1 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-            font-size: 2.2em;
-        }
-
-        .header p {
-            font-size: 16px;
-            color: #666;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.8;
-        }
-
-        .institution-header {
-            text-align: center;
-            margin: 15px 0;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .section {
-            margin-bottom: 30px;
-            padding: 25px;
-            border: 1px solid #e1e1e1;
-            border-radius: 15px;
-            background: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        }
-
-        .section-title {
-            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-            color: #000;
-            padding: 15px 20px;
-            margin: -25px -25px 25px -25px;
-            border-radius: 12px 12px 0 0;
-            font-weight: bold;
-            font-size: 1.3em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 2px solid #a5d6a7;
-        }
-
-        .section-title i {
-            font-size: 1.2em;
-        }
-
-        .form-group h3 {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            color: #000;
-            padding: 12px 15px;
-            margin: 20px -15px 15px -15px;
-            font-weight: bold;
-            border-right: 4px solid #2196f3;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            direction: rtl;
-            font-size: 14px;
-        }
-
-        th, td {
-            border: 1px solid #e1e1e1;
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background: linear-gradient(135deg, var(--primary-color), #34495e);
-            color: white;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .rating-table {
-            direction: rtl;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        input[type="text"], select, textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e1e1e1;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 15px;
-            font-family: "Times New Roman", serif;
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            background: var(--light-color);
-            padding: 8px 12px;
-            border-radius: 8px;
-        }
-
-        .checkbox-item input {
-            margin-left: 8px;
-            transform: scale(1.2);
-        }
-
-        .rating-options {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-size: 13px;
-            direction: rtl;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .rating-option {
-            text-align: center;
-            flex: 1;
-            padding: 8px;
-        }
-
-        .emoji {
-            font-size: 20px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .priority-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .priority-item {
-            display: flex;
-            align-items: center;
-            background: var(--light-color);
-            padding: 12px;
-            border-radius: 8px;
-        }
-
-        .priority-item select {
-            width: 80px;
-            margin-right: 12px;
-            padding: 8px;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-            padding: 20px;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, var(--success-color), #2ecc71);
-            color: white;
-        }
-
-        .excel-btn {
-            background: linear-gradient(135deg, #217346, #1e7e34);
-            color: white;
-        }
-
-        .pdf-btn {
-            background: linear-gradient(135deg, var(--accent-color), #c0392b);
-            color: white;
-        }
-
-        .print-btn {
-            background: linear-gradient(135deg, var(--warning-color), #e67e22);
-            color: white;
-        }
-
-        .reset-btn {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            color: white;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 14px;
-            color: #777;
-            border-top: 1px solid #e1e1e1;
-            padding-top: 20px;
-        }
-
-        input[type="radio"] {
-            transform: scale(1.2);
-            margin: 0 4px;
-        }
-
-        .progress-container {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 8px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
-            border-radius: 8px;
-            transition: width 0.5s ease;
-            width: 0%;
-        }
-
-        @media print {
-            body {
-                background: white !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .container {
-                box-shadow: none !important;
-                padding: 10px !important;
-                margin: 0 !important;
-                width: 100% !important;
-            }
-            .action-buttons, .progress-container {
-                display: none !important;
-            }
-            .section {
-                break-inside: avoid;
-                margin-bottom: 20px;
-            }
-        }
-
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin: 12px 0;
-            display: none;
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-
-        .alert-info {
-            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-        }
-
-        .alert-error {
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .form-field {
-            flex: 1;
-        }
-
-        .job-grade-input {
-            direction: ltr;
-            text-align: right;
-        }
-
-        /* تحميل */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Arial', sans-serif; line-height: 1.3; margin: 0; padding: 0; background-color: #f5f5f5; color: #333; font-size: 14px; }
+        .container { max-width: 1000px; margin: 0 auto; background-color: white; padding: 0; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+        .institution-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: linear-gradient(135deg, #2c3e50, #4CAF50); color: white; border-bottom: 3px solid #34495e; }
+        .logo-section { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .arabic-text { text-align: right; line-height: 1.4; font-size: 14px; flex: 1; }
+        .english-text { text-align: left; line-height: 1.4; font-size: 14px; direction: ltr; flex: 1; }
+        .institution-logo { width: 70px; height: 70px; border: 2px solid white; border-radius: 8px; background: white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #2c3e50; margin: 0 20px; }
+        .logo-image { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .header-text { font-weight: bold; font-size: 14px; }
+        .sub-text { font-size: 12px; opacity: 0.9; }
+        .header { text-align: center; margin: 0; padding: 15px 20px; border-bottom: 2px solid #4CAF50; background: #f8f9fa; }
+        .header h1 { margin-bottom: 8px; color: #2c3e50; font-size: 22px; }
+        .header p { font-size: 14px; color: #555; line-height: 1.4; max-width: 800px; margin: 0 auto; }
+        .section { margin: 0; padding: 15px 20px; border-bottom: 1px solid #e0e0e0; }
+        .section-title { background-color: #4CAF50; color: white; padding: 8px 12px; margin: -15px -20px 12px -20px; font-weight: bold; box-shadow: 0 2px 3px rgba(0,0,0,0.2); font-size: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; direction: rtl; font-size: 15px; }
+        th, td { border: 1px solid #ddd; padding: 5px; text-align: center; }
+        th { background-color: #4CAF50; color: white; font-weight: bold; font-size: 14px; padding: 6px; }
+        .rating-table { direction: rtl; }
+        .form-group { margin-bottom: 15px; }
+        .form-row { display: grid; grid-template-columns: 1fr 0.5fr 1.5fr 0.4fr; gap: 10px; margin-bottom: 15px; }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 10px; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
+        input[type="text"], select, textarea { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 13px; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
+        .checkbox-item { display: flex; align-items: center; font-size: 13px; }
+        .checkbox-item input { margin-left: 5px; }
+        .priority-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
+        .priority-item { display: flex; flex-direction: column; }
+        .priority-item select { margin-top: 4px; }
+        .button-group { display: flex; gap: 15px; justify-content: center; margin: 20px 0; padding: 0 20px; }
+        .btn { background-color: #2c3e50; color: white; border: none; padding: 10px 20px; font-size: 15px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: background-color 0.3s; }
+        .btn:hover { background-color: #1a252f; }
+        .btn-secondary { background-color: #4CAF50; }
+        .btn-secondary:hover { background-color: #388E3C; }
+        .btn-clear { background-color: #e74c3c; }
+        .btn-clear:hover { background-color: #c0392b; }
+        .error-message { color: #e74c3c; font-size: 12px; margin-top: 4px; display: none; }
+        
         .loading-spinner {
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin-left: 8px;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        @media print {
+            @page { margin: 5mm; size: A4; }
+            body { background-color: white; padding: 0; margin: 0; font-size: 13px; line-height: 1.2; width: 100%; }
+            .container { box-shadow: none; padding: 0; margin: 0; max-width: 100%; width: 100%; }
+            .button-group, .no-print { display: none !important; }
+            .institution-header { background: white !important; color: black !important; border-bottom: 2px solid black; padding: 5mm 5mm 2mm 5mm; margin-bottom: 2mm; }
+            .header { page-break-after: avoid; padding: 2mm 5mm; margin: 0; }
+            .header h1 { font-size: 15px; }
+            .header p { font-size: 11px; }
+            .section { margin: 0; padding: 2mm 5mm; border-bottom: 1px solid #ccc; }
+            .section-title { font-size: 13px; padding: 3px 8px; margin: -2mm -5mm 2mm -5mm; }
+            .form-group { margin-bottom: 8px; }
+            table { font-size: 12px; }
+            th, td { padding: 2px 1px; }
+            h3 { page-break-after: avoid; }
+            .form-group:last-child { page-break-after: auto; }
         }
+        .pdf-container { width: 100%; margin: 0 auto; }
     </style>
 </head>
 <body>
-    <div class="container" id="form-container">
-        <div class="header">
-            <h1><i class="fas fa-clipboard-check"></i> استبانة قياس الرضا الوظيفي</h1>
-            <p>تعد الاستبانات واحدة من أهم متطلبات المعايير الدولية التي تساهم في الارتقاء بواقع العمل المؤسسي كونها كشفة عن مؤشرات دقيقة، يقوم قسم ادارة الجودة الشاملة والتطوير المؤسسي بالتعاون مع قسم الرصد وقياس الأثر بتنفيذ هذه الاستبانة خدمة لموظفينا ومؤسستنا وسيتم التعامل مع البيانات بمنتهى السرية.</p>
-            
-            <div class="institution-header">
-                جمهورية العراق<br>
-                رئاسة الوزراء - مؤسسة الشهداء
+<div class="container pdf-container" id="surveyContent">
+    
+    <div class="institution-header">
+        <div class="logo-section">
+            <div class="arabic-text">
+                <div class="header-text">جمهورية العراق</div>
+                <div class="sub-text">رئاسة الوزراء - مؤسسة الشهداء</div>
+                <div class="sub-text">قسم إدارة الجودة الشاملة والتطوير المؤسسي</div>
             </div>
-        </div>
-
-        <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
-        </div>
-
-        <div class="alert alert-success" id="success-alert">
-            <i class="fas fa-check-circle"></i> تم حفظ الاستبيان بنجاح!
-        </div>
-
-        <div class="alert alert-error" id="error-alert">
-            <i class="fas fa-exclamation-triangle"></i> حدث خطأ أثناء حفظ البيانات!
-        </div>
-
-        <div class="alert alert-info" id="excel-alert">
-            <i class="fas fa-file-excel"></i> جاري تحضير ملف Excel...
-        </div>
-
-        <form id="jobSatisfactionForm">
-            <!-- البيانات التعريفية -->
-            <div class="section">
-                <div class="section-title"><i class="fas fa-user-tie"></i> البيانات التعريفية</div>
-                
-                <div class="form-row">
-                    <div class="form-field">
-                        <label for="department"><i class="fas fa-building"></i> اسم الدائرة / التشكيل:</label>
-                        <select id="department" name="department">
-                            <option value="">-- اختر الدائرة / التشكيل --</option>
-                            <option value="م.ش.بابل/ المدير">م.ش.بابل/ المدير</option>
-                            <option value="م.ش.بابل/ المعاون الاداري الاول">م.ش.بابل/ المعاون الاداري الاول</option>
-                            <option value="م.ش.بابل/ المعاون الاداري الثاني">م.ش.بابل/ المعاون الاداري الثاني</option>
-                            <option value="م.ش.بابل/ قسم النظام البائد و الحشد">م.ش.بابل/ قسم النظام البائد و الحشد</option>
-                            <option value="م.ش.بابل/ شعبة سبايكر و بادوش">م.ش.بابل/ شعبة سبايكر و بادوش</option>
-                            <option value="م.ش.بابل/ قسم الارهاب">م.ش.بابل/ قسم الارهاب</option>
-                            <option value="م.ش.بابل/ شعبة الرقابة و التدقيق">م.ش.بابل/ شعبة الرقابة و التدقيق</option>
-                            <option value="م.ش.بابل/ شعبة ادارة الجودة الشاملة">م.ش.بابل/ شعبة ادارة الجودة الشاملة</option>
-                            <option value="م.ش.بابل/ شعبة الشؤون المالية">م.ش.بابل/ شعبة الشؤون المالية</option>
-                            <option value="م.ش.بابل/ شعبة الرعاية العلمية">م.ش.بابل/ شعبة الرعاية العلمية</option>
-                            <option value="م.ش.بابل/ وحدة التصاريح الامنية">م.ش.بابل/ وحدة التصاريح الامنية</option>
-                            <option value="م.ش.بابل/ شعبة المقابر الجماعيـة">م.ش.بابل/ شعبة المقابر الجماعيـة</option>
-                            <option value="م.ش.بابل/ شعبة الادارة">م.ش.بابل/ شعبة الادارة</option>
-                            <option value="م.ش.بابل/ شعبة ادارة الموارد البشرية">م.ش.بابل/ شعبة ادارة الموارد البشرية</option>
-                            <option value="م.ش.بابل/ شعبة التخطيط و الاحصاء">م.ش.بابل/ شعبة التخطيط و الاحصاء</option>
-                            <option value="م.ش.بابل/ شعبة الصندوق">م.ش.بابل/ شعبة الصندوق</option>
-                            <option value="م.ش.بابل/ شعبة الاعلام">م.ش.بابل/ شعبة الاعلام</option>
-                            <option value="م.ش.بابل/ شعبة الحج">م.ش.بابل/ شعبة الحج</option>
-                            <option value="م.ش.بابل/ شعبة تكنولوجيا المعلومات">م.ش.بابل/ شعبة تكنولوجيا المعلومات</option>
-                            <option value="م.ش.بابل/ شعبة الاراضي">م.ش.بابل/ شعبة الاراضي</option>
-                            <option value="م.ش.بابل/ شعبة الاقتصاد و الاستثمار">م.ش.بابل/ شعبة الاقتصاد و الاستثمار</option>
-                            <option value="م.ش.بابل/ الشعبة القانونية">م.ش.بابل/ الشعبة القانونية</option>
-                            <option value="م.ش.بابل/ شعبة شؤون المرأة">م.ش.بابل/ شعبة شؤون المرأة</option>
-                            <option value="م.ش.بابل/ شعبة شؤون المواطنين">م.ش.بابل/ شعبة شؤون المواطنين</option>
-                            <option value="م.ش.بابل/ قسم الشؤون الاجتماعية و الصحية">م.ش.بابل/ قسم الشؤون الاجتماعية و الصحية</option>
-                            <option value="م.ش.بابل/ شعبة الخدمات">م.ش.بابل/ شعبة الخدمات</option>
-                            <option value="م.ش.بابل/ اللجنة الفرعية الثانية">م.ش.بابل/ اللجنة الفرعية الثانية</option>
-                            <option value="م.ش.بابل/ مكتب شهداء القاسم">م.ش.بابل/ مكتب شهداء القاسم</option>
-                            <option value="م.ش.بابل/ مكتب شهداء ح.غ">م.ش.بابل/ مكتب شهداء ح.غ</option>
-                            <option value="م.ش.بابل/ مكتب شهداء المسيب">م.ش.بابل/ مكتب شهداء المسيب</option>
-                            <option value="م.ش.بابل/ مكتب شهداء الهاشمية">م.ش.بابل/ مكتب شهداء الهاشمية</option>
-                            <option value="م.ش.بابل/ مكتب شهداء ناحية الامام">م.ش.بابل/ مكتب شهداء ناحية الامام</option>
-                            <option value="م.ش.بابل/ و.الصيانة">م.ش.بابل/ و.الصيانة</option>
-                            <option value="م.ش.بابل/ و.الدفاع المدني">م.ش.بابل/ و.الدفاع المدني</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-field">
-                        <label for="jobGrade"><i class="fas fa-id-card"></i> الدرجة الوظيفية:</label>
-                        <input type="text" id="jobGrade" name="jobGrade" class="job-grade-input" placeholder="3 \ 5" pattern="\d+\s*\\\s*\d+" title="يجب أن يكون التنسيق: رقم \ رقم">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-briefcase"></i> الفئة / مكان طبيعة العمل:</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="jobType1" name="jobType" value="قيادية/اشرافية">
-                            <label for="jobType1">وظيفة قيادية/ أشرافية (من معاون مدير عام الى مسؤول شعبة)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="jobType2" name="jobType" value="ادارية">
-                            <label for="jobType2">وظيفة ادارية تنظيمية/ اعمال ادارية او مراسيمية ( ) وظيفة فنية (تقدية، هندسية، حرفية)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="jobType3" name="jobType" value="تخصصية">
-                            <label for="jobType3">وظيفة تخصصية (ماي، قانوني، محلل، مترجم، اعلاي، مطبخ، نادل، محقق أمين)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="jobType4" name="jobType" value="ساندة">
-                            <label for="jobType4">وظيفة ساندة/ عدال، موزع بريد، ضيافة، خدمات، سائق</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-network-wired"></i> بنية العمل:</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="workStructure1" name="workStructure" value="ميداني">
-                            <label for="workStructure1">ميداني (مكتبي) يمكن التأشير على أكثر من اختيار ( ) أمين</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="workStructure2" name="workStructure" value="عسكري">
-                            <label for="workStructure2">عسكري</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-calendar-alt"></i> سنوات الخدمة الفعلية:</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="radio" id="service1" name="serviceYears" value="15+">
-                            <label for="service1">15 سنة فما فوق</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="service2" name="serviceYears" value="10-15">
-                            <label for="service2">10 إلى 15 سنة</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="service3" name="serviceYears" value="5-10">
-                            <label for="service3">5 إلى 10 سنوات</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="service4" name="serviceYears" value="1-5">
-                            <label for="service4">1 إلى 5 سنوات</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-venus-mars"></i> الجنس:</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="radio" id="genderMale" name="gender" value="ذكر">
-                            <label for="genderMale">ذكر</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="genderFemale" name="gender" value="أنثى">
-                            <label for="genderFemale">أنثى</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-graduation-cap"></i> التحصيل العلمي:</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="radio" id="edu1" name="education" value="دبلوم عالي">
-                            <label for="edu1">دبلوم علي أو أعلى</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="edu2" name="education" value="بكالوريوس">
-                            <label for="edu2">بكلوريوس</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="edu3" name="education" value="دبلوم">
-                            <label for="edu3">دبلوم</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="edu4" name="education" value="اعدادية">
-                            <label for="edu4">اعدادية</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="edu5" name="education" value="متوسطة">
-                            <label for="edu5">متوسطة فما دون</label>
-                        </div>
-                    </div>
-                </div>
+            <div class="institution-logo">
+                <img src=" قم بوضع الكود هنا الخاص بصورة الشعار" alt="شعار مؤسسة الشهداء" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
-
-            <!-- محاور الاستبيان -->
-            <div class="section">
-                <div class="section-title"><i class="fas fa-chart-bar"></i> محاور استبانة رضا الأطراف المعنية</div>
-                <p>ادناه محاور استبانة رضا الأطراف المعنية وفقاً للمقاييس من (5 - 1) على ان يكون (1) ادنى قيمة و (5) اعلى قيمة.</p>
-                <p><strong><i class="fas fa-info-circle"></i> ملاحظة:</strong> لتحقيق نتائج دقيقة عن مدى رضاكم الوظيفي في مؤسستنا يرجى الإجابة على الفقرات جميعها لكل محور، شاكرين تعاونكم معنا.</p>
-                
-                <div class="rating-options">
-                    <div class="rating-option">
-                        <span class="emoji">😠</span>
-                        غير راضي
-                    </div>
-                    <div class="rating-option">
-                        <span class="emoji">😕</span>
-                        غير راضي إلى حد ما
-                    </div>
-                    <div class="rating-option">
-                        <span class="emoji">😐</span>
-                        محايد
-                    </div>
-                    <div class="rating-option">
-                        <span class="emoji">🙂</span>
-                        راضي إلى حد ما
-                    </div>
-                    <div class="rating-option">
-                        <span class="emoji">😊</span>
-                        راضي جداً
-                    </div>
-                </div>
-
-                <!-- القيادة والإدارة -->
-                <div class="form-group">
-                    <h3><i class="fas fa-users"></i> أولاً: القيادة والإدارة</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>تقوم القيادة والإدارة بإشراك موظفيهما عند اتخاذ قرارات تهم الجميع.</td>
-                                <td><input type="radio" name="leadership1" value="1"></td>
-                                <td><input type="radio" name="leadership1" value="2"></td>
-                                <td><input type="radio" name="leadership1" value="3"></td>
-                                <td><input type="radio" name="leadership1" value="4"></td>
-                                <td><input type="radio" name="leadership1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>تعتمد القيادة او الإدارة مبدأ العدالة في توزيع الامتيازات بين الموظفين.</td>
-                                <td><input type="radio" name="leadership2" value="1"></td>
-                                <td><input type="radio" name="leadership2" value="2"></td>
-                                <td><input type="radio" name="leadership2" value="3"></td>
-                                <td><input type="radio" name="leadership2" value="4"></td>
-                                <td><input type="radio" name="leadership2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>توجد البية لدى القيادة والإدارة للتعامل مع التغذيات الراجعة (مقترحات / شكاوى) المقدمة من قبل الموظفين.</td>
-                                <td><input type="radio" name="leadership3" value="1"></td>
-                                <td><input type="radio" name="leadership3" value="2"></td>
-                                <td><input type="radio" name="leadership3" value="3"></td>
-                                <td><input type="radio" name="leadership3" value="4"></td>
-                                <td><input type="radio" name="leadership3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>تتمتع القيادة والإدارة بالمرونة في معالجة الإزمات.</td>
-                                <td><input type="radio" name="leadership4" value="1"></td>
-                                <td><input type="radio" name="leadership4" value="2"></td>
-                                <td><input type="radio" name="leadership4" value="3"></td>
-                                <td><input type="radio" name="leadership4" value="4"></td>
-                                <td><input type="radio" name="leadership4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>تشجع وتثمن القيادة والإدارة الأفكار الإبداعية والابتكار.</td>
-                                <td><input type="radio" name="leadership5" value="1"></td>
-                                <td><input type="radio" name="leadership5" value="2"></td>
-                                <td><input type="radio" name="leadership5" value="3"></td>
-                                <td><input type="radio" name="leadership5" value="4"></td>
-                                <td><input type="radio" name="leadership5" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- التخطيط الاستراتيجي -->
-                <div class="form-group">
-                    <h3><i class="fas fa-chess-board"></i> ثانياً: التخطيط الستراتيجي</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>معرفتك برؤية مؤسستك وغاياتها الستراتيجية جيدة.</td>
-                                <td><input type="radio" name="strategy1" value="1"></td>
-                                <td><input type="radio" name="strategy1" value="2"></td>
-                                <td><input type="radio" name="strategy1" value="3"></td>
-                                <td><input type="radio" name="strategy1" value="4"></td>
-                                <td><input type="radio" name="strategy1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يتم اشتراك بإعداد الأهداف الستراتيجية في دائرتك.</td>
-                                <td><input type="radio" name="strategy2" value="1"></td>
-                                <td><input type="radio" name="strategy2" value="2"></td>
-                                <td><input type="radio" name="strategy2" value="3"></td>
-                                <td><input type="radio" name="strategy2" value="4"></td>
-                                <td><input type="radio" name="strategy2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>تعرف دورك ومسؤوليتك جيدا في تنفيذ الخطة الستراتيجية لدائرتك.</td>
-                                <td><input type="radio" name="strategy3" value="1"></td>
-                                <td><input type="radio" name="strategy3" value="2"></td>
-                                <td><input type="radio" name="strategy3" value="3"></td>
-                                <td><input type="radio" name="strategy3" value="4"></td>
-                                <td><input type="radio" name="strategy3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>التوجه الستراتيجي لمؤسستك بنسبة مع متطلباتك وأهدافك وطموحاتك.</td>
-                                <td><input type="radio" name="strategy4" value="1"></td>
-                                <td><input type="radio" name="strategy4" value="2"></td>
-                                <td><input type="radio" name="strategy4" value="3"></td>
-                                <td><input type="radio" name="strategy4" value="4"></td>
-                                <td><input type="radio" name="strategy4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>تطابق الهيكل التنظيمي والوظيفي وفق متطلبات تنفيذ الخطة الستراتيجية.</td>
-                                <td><input type="radio" name="strategy5" value="1"></td>
-                                <td><input type="radio" name="strategy5" value="2"></td>
-                                <td><input type="radio" name="strategy5" value="3"></td>
-                                <td><input type="radio" name="strategy5" value="4"></td>
-                                <td><input type="radio" name="strategy5" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- التمكين -->
-                <div class="form-group">
-                    <h3><i class="fas fa-user-shield"></i> ثالثاً: التمكين</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>يتم تمكين الموظفين في دائرتك بتفويضهم الصلاحيات لأداء المهام.</td>
-                                <td><input type="radio" name="empowerment1" value="1"></td>
-                                <td><input type="radio" name="empowerment1" value="2"></td>
-                                <td><input type="radio" name="empowerment1" value="3"></td>
-                                <td><input type="radio" name="empowerment1" value="4"></td>
-                                <td><input type="radio" name="empowerment1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يتطلب القيام بالمهام المناطة بك سلسلة إجراءات وموافقات إدارية طويلة.</td>
-                                <td><input type="radio" name="empowerment2" value="1"></td>
-                                <td><input type="radio" name="empowerment2" value="2"></td>
-                                <td><input type="radio" name="empowerment2" value="3"></td>
-                                <td><input type="radio" name="empowerment2" value="4"></td>
-                                <td><input type="radio" name="empowerment2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يتم تزويدك بكافة المعلومات التي تحتاجها لأداء عملك بصورة دقيقة.</td>
-                                <td><input type="radio" name="empowerment3" value="1"></td>
-                                <td><input type="radio" name="empowerment3" value="2"></td>
-                                <td><input type="radio" name="empowerment3" value="3"></td>
-                                <td><input type="radio" name="empowerment3" value="4"></td>
-                                <td><input type="radio" name="empowerment3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>تثـق يقابليات الأفراد المتمكين في تقديمهم المعلومات الصحيحة واستعدادهم لتحمل المسؤولية.</td>
-                                <td><input type="radio" name="empowerment4" value="1"></td>
-                                <td><input type="radio" name="empowerment4" value="2"></td>
-                                <td><input type="radio" name="empowerment4" value="3"></td>
-                                <td><input type="radio" name="empowerment4" value="4"></td>
-                                <td><input type="radio" name="empowerment4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يتم توزيع الفرص التدريبية لتطوير المهارات بشكل عادل وشفاف لجميع الموظفين في دائرتك.</td>
-                                <td><input type="radio" name="empowerment5" value="1"></td>
-                                <td><input type="radio" name="empowerment5" value="2"></td>
-                                <td><input type="radio" name="empowerment5" value="3"></td>
-                                <td><input type="radio" name="empowerment5" value="4"></td>
-                                <td><input type="radio" name="empowerment5" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>توفر دائرتك المستلزمات المطلوبة للقيام بمهامك (حاسبات، وسائل تقل، ثاث، انترنيت، قرطاسية، الخ).</td>
-                                <td><input type="radio" name="empowerment6" value="1"></td>
-                                <td><input type="radio" name="empowerment6" value="2"></td>
-                                <td><input type="radio" name="empowerment6" value="3"></td>
-                                <td><input type="radio" name="empowerment6" value="4"></td>
-                                <td><input type="radio" name="empowerment6" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- التحفيز (الدافعية) -->
-                <div class="form-group">
-                    <h3><i class="fas fa-trophy"></i> رابعاً: التحفيز (الدافعية)</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>تشعر عند تقديمك لعمل متميز أو فكرة إبداعية بأنه سوف يتم التقدير والثناء عليـك.</td>
-                                <td><input type="radio" name="motivation1" value="1"></td>
-                                <td><input type="radio" name="motivation1" value="2"></td>
-                                <td><input type="radio" name="motivation1" value="3"></td>
-                                <td><input type="radio" name="motivation1" value="4"></td>
-                                <td><input type="radio" name="motivation1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>بيئة عملك تشجع على التفاعل مع الموظفين والعمل بروج الفريق.</td>
-                                <td><input type="radio" name="motivation2" value="1"></td>
-                                <td><input type="radio" name="motivation2" value="2"></td>
-                                <td><input type="radio" name="motivation2" value="3"></td>
-                                <td><input type="radio" name="motivation2" value="4"></td>
-                                <td><input type="radio" name="motivation2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يتم التعامل مع اختلافك في العمل بعيدا عن اللوم والنقد السلبي.</td>
-                                <td><input type="radio" name="motivation3" value="1"></td>
-                                <td><input type="radio" name="motivation3" value="2"></td>
-                                <td><input type="radio" name="motivation3" value="3"></td>
-                                <td><input type="radio" name="motivation3" value="4"></td>
-                                <td><input type="radio" name="motivation3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>إن منح لقب (الموظف المتميز أو الموظف المثالي) يرفع من الروح التنافسية والدافعية والتحفيز للموظفين (عدد اعتماد معايير مهنية).</td>
-                                <td><input type="radio" name="motivation4" value="1"></td>
-                                <td><input type="radio" name="motivation4" value="2"></td>
-                                <td><input type="radio" name="motivation4" value="3"></td>
-                                <td><input type="radio" name="motivation4" value="4"></td>
-                                <td><input type="radio" name="motivation4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>أن منح المكافآت المادية يرفع من دافعية الموظفين للعمل.</td>
-                                <td><input type="radio" name="motivation5" value="1"></td>
-                                <td><input type="radio" name="motivation5" value="2"></td>
-                                <td><input type="radio" name="motivation5" value="3"></td>
-                                <td><input type="radio" name="motivation5" value="4"></td>
-                                <td><input type="radio" name="motivation5" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- الولاء والانتماء الوظيفي -->
-                <div class="form-group">
-                    <h3><i class="fas fa-heart"></i> خامساً: الولاء والأنتماء الوظيفي</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>تهتم مؤسستك بتخفيف ضغوطات العمل عليك آخذة بنظر الاعتبار أعباء الحياة.</td>
-                                <td><input type="radio" name="loyalty1" value="1"></td>
-                                <td><input type="radio" name="loyalty1" value="2"></td>
-                                <td><input type="radio" name="loyalty1" value="3"></td>
-                                <td><input type="radio" name="loyalty1" value="4"></td>
-                                <td><input type="radio" name="loyalty1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>أنت تشعر بالحماس عند القيام بعـملك.</td>
-                                <td><input type="radio" name="loyalty2" value="1"></td>
-                                <td><input type="radio" name="loyalty2" value="2"></td>
-                                <td><input type="radio" name="loyalty2" value="3"></td>
-                                <td><input type="radio" name="loyalty2" value="4"></td>
-                                <td><input type="radio" name="loyalty2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>عند السؤال عن مؤسستك تقوم بمدحها والأشادة بدورها في البلد.</td>
-                                <td><input type="radio" name="loyalty3" value="1"></td>
-                                <td><input type="radio" name="loyalty3" value="2"></td>
-                                <td><input type="radio" name="loyalty3" value="3"></td>
-                                <td><input type="radio" name="loyalty3" value="4"></td>
-                                <td><input type="radio" name="loyalty3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>في حال تعرضت مؤسستك لأزمة فأنت تشعر أنك جزء منها وتشارك في حلها بأي طريقة متاحة لك.</td>
-                                <td><input type="radio" name="loyalty4" value="1"></td>
-                                <td><input type="radio" name="loyalty4" value="2"></td>
-                                <td><input type="radio" name="loyalty4" value="3"></td>
-                                <td><input type="radio" name="loyalty4" value="4"></td>
-                                <td><input type="radio" name="loyalty4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>مستقبلك في مؤسستك آمن ولا يوجد قلق من تخليها عنك.</td>
-                                <td><input type="radio" name="loyalty5" value="1"></td>
-                                <td><input type="radio" name="loyalty5" value="2"></td>
-                                <td><input type="radio" name="loyalty5" value="3"></td>
-                                <td><input type="radio" name="loyalty5" value="4"></td>
-                                <td><input type="radio" name="loyalty5" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>رد الجميل لك عند قيامك يعمل مميز يعزز من انتمالك للمؤسسة.</td>
-                                <td><input type="radio" name="loyalty6" value="1"></td>
-                                <td><input type="radio" name="loyalty6" value="2"></td>
-                                <td><input type="radio" name="loyalty6" value="3"></td>
-                                <td><input type="radio" name="loyalty6" value="4"></td>
-                                <td><input type="radio" name="loyalty6" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- الاستحقاق الوظيفي -->
-                <div class="form-group">
-                    <h3><i class="fas fa-award"></i> سادساً: الاستحقاق الوظيفي</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>يقوم مديرك بإزالة عوامل الشرقية والمحسوبية عند تعامله مع الموظفين.</td>
-                                <td><input type="radio" name="entitlement1" value="1"></td>
-                                <td><input type="radio" name="entitlement1" value="2"></td>
-                                <td><input type="radio" name="entitlement1" value="3"></td>
-                                <td><input type="radio" name="entitlement1" value="4"></td>
-                                <td><input type="radio" name="entitlement1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يقوم مديرك المباشر بمناقشتك نتائج تقييمك الفصلية والسنوية.</td>
-                                <td><input type="radio" name="entitlement2" value="1"></td>
-                                <td><input type="radio" name="entitlement2" value="2"></td>
-                                <td><input type="radio" name="entitlement2" value="3"></td>
-                                <td><input type="radio" name="entitlement2" value="4"></td>
-                                <td><input type="radio" name="entitlement2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>معرفتك بحقوقك وواجباتك الوظيفية جيدة.</td>
-                                <td><input type="radio" name="entitlement3" value="1"></td>
-                                <td><input type="radio" name="entitlement3" value="2"></td>
-                                <td><input type="radio" name="entitlement3" value="3"></td>
-                                <td><input type="radio" name="entitlement3" value="4"></td>
-                                <td><input type="radio" name="entitlement3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>انسيابية إجراءات الترفيع والترقية.</td>
-                                <td><input type="radio" name="entitlement4" value="1"></td>
-                                <td><input type="radio" name="entitlement4" value="2"></td>
-                                <td><input type="radio" name="entitlement4" value="3"></td>
-                                <td><input type="radio" name="entitlement4" value="4"></td>
-                                <td><input type="radio" name="entitlement4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يتم توزيع الاستحقاقات الوظيفية بشكل عادل (إجازات، نفرخ دراسي، امومة، مخصصات مهنية الخ).</td>
-                                <td><input type="radio" name="entitlement5" value="1"></td>
-                                <td><input type="radio" name="entitlement5" value="2"></td>
-                                <td><input type="radio" name="entitlement5" value="3"></td>
-                                <td><input type="radio" name="entitlement5" value="4"></td>
-                                <td><input type="radio" name="entitlement5" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>هناك توازن ما بين العقوبة المفروضة على الموظف ونوع المخالفة.</td>
-                                <td><input type="radio" name="entitlement6" value="1"></td>
-                                <td><input type="radio" name="entitlement6" value="2"></td>
-                                <td><input type="radio" name="entitlement6" value="3"></td>
-                                <td><input type="radio" name="entitlement6" value="4"></td>
-                                <td><input type="radio" name="entitlement6" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- التواصل -->
-                <div class="form-group">
-                    <h3><i class="fas fa-comments"></i> سابعاً: التواصل</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>تواصلك مع مديرك لمناقشة أمور العمل يتم بشكل سلس (اعتماد سياسة الباب المفتوح).</td>
-                                <td><input type="radio" name="communication1" value="1"></td>
-                                <td><input type="radio" name="communication1" value="2"></td>
-                                <td><input type="radio" name="communication1" value="3"></td>
-                                <td><input type="radio" name="communication1" value="4"></td>
-                                <td><input type="radio" name="communication1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يزور مديرك موقع عملك للاطمئنان على توفير متطلبات وآليـة سير العمل.</td>
-                                <td><input type="radio" name="communication2" value="1"></td>
-                                <td><input type="radio" name="communication2" value="2"></td>
-                                <td><input type="radio" name="communication2" value="3"></td>
-                                <td><input type="radio" name="communication2" value="4"></td>
-                                <td><input type="radio" name="communication2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يعطيك مديرك تغذية راجعة عن دورك وفاعليتك في العمل فأنت لست مضطر لتخمين ما يدور في ذهنه.</td>
-                                <td><input type="radio" name="communication3" value="1"></td>
-                                <td><input type="radio" name="communication3" value="2"></td>
-                                <td><input type="radio" name="communication3" value="3"></td>
-                                <td><input type="radio" name="communication3" value="4"></td>
-                                <td><input type="radio" name="communication3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>التواصل والتعاون بين موظفي دائرك فاعل.</td>
-                                <td><input type="radio" name="communication4" value="1"></td>
-                                <td><input type="radio" name="communication4" value="2"></td>
-                                <td><input type="radio" name="communication4" value="3"></td>
-                                <td><input type="radio" name="communication4" value="4"></td>
-                                <td><input type="radio" name="communication4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>أسهمت التكنولوجيا برفـع مستوى التواصل بينك وبين مديرك والأخرين.</td>
-                                <td><input type="radio" name="communication5" value="1"></td>
-                                <td><input type="radio" name="communication5" value="2"></td>
-                                <td><input type="radio" name="communication5" value="3"></td>
-                                <td><input type="radio" name="communication5" value="4"></td>
-                                <td><input type="radio" name="communication5" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- السلوك الوظيفي -->
-                <div class="form-group">
-                    <h3><i class="fas fa-user-check"></i> ثامناً: السلوك الوظيفي</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>يلتزم موظفي مؤسستك بالحياد اتجاه الأخرين ولا يتم التمييز على أساس الجنس أو الدين أو القومية أو المعتقد.</td>
-                                <td><input type="radio" name="behavior1" value="1"></td>
-                                <td><input type="radio" name="behavior1" value="2"></td>
-                                <td><input type="radio" name="behavior1" value="3"></td>
-                                <td><input type="radio" name="behavior1" value="4"></td>
-                                <td><input type="radio" name="behavior1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يمتـنـع موظفي مؤسستك عن ممارسة تصرفات أو أمور تنـتهك السلوك والادب الوظيفي.</td>
-                                <td><input type="radio" name="behavior2" value="1"></td>
-                                <td><input type="radio" name="behavior2" value="2"></td>
-                                <td><input type="radio" name="behavior2" value="3"></td>
-                                <td><input type="radio" name="behavior2" value="4"></td>
-                                <td><input type="radio" name="behavior2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يحترم موظفي مؤسستك القوانين والتعليمات والأنظمة النافذة.</td>
-                                <td><input type="radio" name="behavior3" value="1"></td>
-                                <td><input type="radio" name="behavior3" value="2"></td>
-                                <td><input type="radio" name="behavior3" value="3"></td>
-                                <td><input type="radio" name="behavior3" value="4"></td>
-                                <td><input type="radio" name="behavior3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>توجد جهة وقابلة تتابع تنفيذ القوانين والتعليمات والأنظمة وتحاسب مخالفها.</td>
-                                <td><input type="radio" name="behavior4" value="1"></td>
-                                <td><input type="radio" name="behavior4" value="2"></td>
-                                <td><input type="radio" name="behavior4" value="3"></td>
-                                <td><input type="radio" name="behavior4" value="4"></td>
-                                <td><input type="radio" name="behavior4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يحافظ موظفي مؤسستك على سرية المعلومات التي لا يفـترض إعلانها خارج المؤسسة.</td>
-                                <td><input type="radio" name="behavior5" value="1"></td>
-                                <td><input type="radio" name="behavior5" value="2"></td>
-                                <td><input type="radio" name="behavior5" value="3"></td>
-                                <td><input type="radio" name="behavior5" value="4"></td>
-                                <td><input type="radio" name="behavior5" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يتعامل موظفي مؤسستك مع مسؤوليهم عبر أساليب تبتعد عن التملـّـق والمحسوبية.</td>
-                                <td><input type="radio" name="behavior6" value="1"></td>
-                                <td><input type="radio" name="behavior6" value="2"></td>
-                                <td><input type="radio" name="behavior6" value="3"></td>
-                                <td><input type="radio" name="behavior6" value="4"></td>
-                                <td><input type="radio" name="behavior6" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>ارتداء الزي الرسمي لموظفي مؤسستك يعكس صورة إيجابية عنها.</td>
-                                <td><input type="radio" name="behavior7" value="1"></td>
-                                <td><input type="radio" name="behavior7" value="2"></td>
-                                <td><input type="radio" name="behavior7" value="3"></td>
-                                <td><input type="radio" name="behavior7" value="4"></td>
-                                <td><input type="radio" name="behavior7" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يحافظ موظفي مؤسستك على الممتلكات العامة ولا يستخدمها لأغراض شخصية.</td>
-                                <td><input type="radio" name="behavior8" value="1"></td>
-                                <td><input type="radio" name="behavior8" value="2"></td>
-                                <td><input type="radio" name="behavior8" value="3"></td>
-                                <td><input type="radio" name="behavior8" value="4"></td>
-                                <td><input type="radio" name="behavior8" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- السلامة والصحة المهنية والبيئة -->
-                <div class="form-group">
-                    <h3><i class="fas fa-shield-alt"></i> تاسعاً: السلامة والصحة المهنية والبيئة</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>معرفي جيدة بالتعليمات الخاصة بالسلامة والصحة المهنية والبيئة.</td>
-                                <td><input type="radio" name="safety1" value="1"></td>
-                                <td><input type="radio" name="safety1" value="2"></td>
-                                <td><input type="radio" name="safety1" value="3"></td>
-                                <td><input type="radio" name="safety1" value="4"></td>
-                                <td><input type="radio" name="safety1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>عمليات الأخلاء ساهمت بنشر الوعي بتعليمات السلامة والصحة المهنية</td>
-                                <td><input type="radio" name="safety2" value="1"></td>
-                                <td><input type="radio" name="safety2" value="2"></td>
-                                <td><input type="radio" name="safety2" value="3"></td>
-                                <td><input type="radio" name="safety2" value="4"></td>
-                                <td><input type="radio" name="safety2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>بيئة عملك (المكتب - التهوية - الإضاءة - ... الخ) جيدة.</td>
-                                <td><input type="radio" name="safety3" value="1"></td>
-                                <td><input type="radio" name="safety3" value="2"></td>
-                                <td><input type="radio" name="safety3" value="3"></td>
-                                <td><input type="radio" name="safety3" value="4"></td>
-                                <td><input type="radio" name="safety3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>لمنسقي السلامة والصحة المهنية والبيئة في دائرتك دور كبير في الاطلاع عن مخاطر العمل و نشر الوعي الصحي والمهني والبيئي.</td>
-                                <td><input type="radio" name="safety4" value="1"></td>
-                                <td><input type="radio" name="safety4" value="2"></td>
-                                <td><input type="radio" name="safety4" value="3"></td>
-                                <td><input type="radio" name="safety4" value="4"></td>
-                                <td><input type="radio" name="safety4" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يلتزم موظفي مؤسستك بشروط السلامة والصحة المهنية والبيئة.</td>
-                                <td><input type="radio" name="safety5" value="1"></td>
-                                <td><input type="radio" name="safety5" value="2"></td>
-                                <td><input type="radio" name="safety5" value="3"></td>
-                                <td><input type="radio" name="safety5" value="4"></td>
-                                <td><input type="radio" name="safety5" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يفي صندوق الأسعاقات الأولية بالحاجات الضرورية.</td>
-                                <td><input type="radio" name="safety6" value="1"></td>
-                                <td><input type="radio" name="safety6" value="2"></td>
-                                <td><input type="radio" name="safety6" value="3"></td>
-                                <td><input type="radio" name="safety6" value="4"></td>
-                                <td><input type="radio" name="safety6" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- الجانب المعنوي -->
-                <div class="form-group">
-                    <h3><i class="fas fa-smile"></i> عاشراً: الجانب المعنوي</h3>
-                    <table class="rating-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 60%;">العبارة</th>
-                                <th>غير راضي</th>
-                                <th>غير راضي إلى حد ما</th>
-                                <th>محايد</th>
-                                <th>راضي إلى حد ما</th>
-                                <th>راضي جداً</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>إجراءات التفتيش الحالية وانسيابية الدخول للمؤسسة جيدة.</td>
-                                <td><input type="radio" name="moral1" value="1"></td>
-                                <td><input type="radio" name="moral1" value="2"></td>
-                                <td><input type="radio" name="moral1" value="3"></td>
-                                <td><input type="radio" name="moral1" value="4"></td>
-                                <td><input type="radio" name="moral1" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>تهتم مؤسستك بالأواصر والعلاقات الاجتماعية لما لها الأثر الايجابي في رفع الروح المعنوية في العمل.</td>
-                                <td><input type="radio" name="moral2" value="1"></td>
-                                <td><input type="radio" name="moral2" value="2"></td>
-                                <td><input type="radio" name="moral2" value="3"></td>
-                                <td><input type="radio" name="moral2" value="4"></td>
-                                <td><input type="radio" name="moral2" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>يتم الأخذ بنظر الاعتبار النوع الاجتماعي/الجندر/ الجنس/عدد توزيع الامتيازات والأدوار في دائرتك.</td>
-                                <td><input type="radio" name="moral3" value="1"></td>
-                                <td><input type="radio" name="moral3" value="2"></td>
-                                <td><input type="radio" name="moral3" value="3"></td>
-                                <td><input type="radio" name="moral3" value="4"></td>
-                                <td><input type="radio" name="moral3" value="5"></td>
-                            </tr>
-                            <tr>
-                                <td>تتسم العلاقات بين الموظفين ومسؤوليهم في دائرتك بالثقة والاحترام المتبادل.</td>
-                                <td><input type="radio" name="moral4" value="1"></td>
-                                <td><input type="radio" name="moral4" value="2"></td>
-                                <td><input type="radio" name="moral4" value="3"></td>
-                                <td><input type="radio" name="moral4" value="4"></td>
-                                <td><input type="radio" name="moral4" value="5"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- أولويات التأثير المعنوي -->
-                <div class="form-group">
-                    <h3><i class="fas fa-star"></i> أولويات التأثير المعنوي</h3>
-                    <p>أي من القضايا التالية يعتقد بأن لها أثر إيجابي معنوي لديك لتأدية العمل (اذكر اجابتك برقم يعبر عن الأولوية حيث ان رقم 1) هو أدنى قيمة والرقم (5) هو اعلى قيمة.</p>
-                    
-                    <div class="priority-list">
-                        <div class="priority-item">
-                            <label for="priority1"><i class="fas fa-bus"></i> وسائل النقل:</label>
-                            <select id="priority1" name="priority1">
-                                <option value="">-- اختر --</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="priority-item">
-                            <label for="priority2"><i class="fas fa-utensils"></i> كافتريا:</label>
-                            <select id="priority2" name="priority2">
-                                <option value="">-- اختر --</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="priority-item">
-                            <label for="priority3"><i class="fas fa-baby"></i> الحضانة والروضة:</label>
-                            <select id="priority3" name="priority3">
-                                <option value="">-- اختر --</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="priority-item">
-                            <label for="priority4"><i class="fas fa-dumbbell"></i> قاعة رياضية:</label>
-                            <select id="priority4" name="priority4">
-                                <option value="">-- اختر --</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="priority-item">
-                            <label for="priority5"><i class="fas fa-gamepad"></i> برامج ترفيهية - مسابقات:</label>
-                            <select id="priority5" name="priority5">
-                                <option value="">-- اختر --</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- المقترحات والأفكار -->
-                <div class="form-group">
-                    <h3><i class="fas fa-lightbulb"></i> المقترحات والأفكار:</h3>
-                    <div class="form-group">
-                        <textarea id="suggestions" name="suggestions" rows="5" style="width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 10px; font-size: 16px;" placeholder="يرجى كتابة مقترحاتك وأفكارك هنا..."></textarea>
-                    </div>
-                </div>
+            <div class="english-text">
+                <div class="header-text">Republic of Iraq</div>
+                <div class="sub-text">Presidency Of Ministers - Foundation Of Martyrs</div>
+                <div class="sub-text">Department of Total Quality Management and Organizational Development</div>
             </div>
-
-            <div class="action-buttons">
-                <button type="submit" class="btn submit-btn" id="submitBtn">
-                    <i class="fas fa-paper-plane"></i> إرسال الاستبيان
-                </button>
-                <button type="button" class="btn excel-btn" id="exportExcel">
-                    <i class="fas fa-file-excel"></i> تنزيل Excel
-                </button>
-                <button type="button" class="btn pdf-btn" id="savePdf">
-                    <i class="fas fa-file-pdf"></i> حفظ كPDF
-                </button>
-                <button type="button" class="btn print-btn" id="printForm">
-                    <i class="fas fa-print"></i> طباعة
-                </button>
-                <button type="button" class="btn reset-btn" id="resetForm">
-                    <i class="fas fa-redo"></i> إعادة تعيين
-                </button>
-            </div>
-        </form>
-
-        <div class="footer">
-            <p><i class="fas fa-copyright"></i> قسم إدارة الجودة الشاملة والتطوير المؤسسي © 2023</p>
         </div>
     </div>
+    
+    <div class="header">
+        <h1>استبانة قياس الرضا الوظيفي</h1>
+        <p>تعد الاستبانات واحدة من متطلبات المعايير الدولية التي ترتقي بواقع العمل المؤسسي، يقوم قسم ادارة الجودة بالتعاون مع قسم الرصد وقياس الأثر بتنفيذ هذه الاستبانة خدمة لموظفينا ومؤسستنا وسيتم التعامل مع البيانات بمنتهى السرية.</p>
+        <p class="no-print" style="background-color: #e9f7ef; color: #0c5460; padding: 10px; border-radius: 8px; border-right: 4px solid #badbcc;">
+            💻 يُـرجى تعبئة هذه الاستمارة و طباعـتها من جهاز حاسوب لطفاً.
+        </p>
+    </div>
+    
+    <form id="jobSatisfactionForm">
+        <!-- البيانات التعريفية -->
+        <div class="section">
+            <div class="section-title">البيانات التعريفية</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="department">اسم التشكيل:</label>
+                    <select id="department" name="department" required>
+                        <option value="">-- اختر من القائمة --</option>
+                        <option value="بابل/ المدير">بابل/ المدير</option>
+                        <option value="بابل/ المعاون الاداري الاول">بابل/ المعاون الاداري</option>
+                        <option value="بابل/ المعاون الاداري الثاني">بابل/ المعاون الفني</option>
+                        <option value="بابل/ قسم النظام البائد و الحشد">بابل/ قسم النظام البائد و الحشد</option>
+                        <option value="بابل/ قسم الارهاب">بابل/ قسم الارهاب</option>
+                        <option value="بابل/ قسم الرقابة و التدقيق">بابل/ قسم الرقابة و التدقـيق</option>
+                        <option value="بابل/ وحدة ادارة الجودة الشاملة">بابل/ وحدة ادارة الجودة الشاملة</option>
+                        <option value="بابل/ قسم الشؤون الادارية والمالية">بابل/ قسم الشؤون الادارية و المالية</option>
+                        <option value="بابل/ شعبة الرعاية العلمية">بابل/ شعبة الرعاية العلمية</option>
+                        <option value="بابل/ شعبة التصاريح الامنية">بابل/ شعبة التصاريح الامنية</option>
+                        <option value="بابل/ شعبة المقابر الجماعيـة">بابل/ شعبة المقابر الجماعيـة</option>
+                        <option value="بابل/ شعبة الصندوق">بابل/ شعبة الصندوق</option>
+                        <option value="بابل/ شعبة الاعلام">بابل/ شعبة الاعلام</option>
+                        <option value="بابل/ شعبة الحج">بابل/ شعبة الحج</option>
+                        <option value="بابل/ وحدة الاراضي">بابل/ وحدة الاراضي</option>
+                        <option value="بابل/ شعبة الاقتصاد و الاستثمار">بابل/ شعبة الاقتصاد و الاستثمار</option>
+                        <option value="بابل/ الشعبة القانونية">بابل/ الشعبة القانونية</option>
+                        <option value="بابل/ وحدة شؤون المرأة">بابل/ وحدة شؤون المرأة</option>
+                        <option value="بابل/ شعبة شؤون المواطنين">بابل/ شعبة شؤون المواطنين</option>
+                        <option value="بابل/ قسم الشؤون الاجتماعية و الصحية">بابل/ قسم الشؤون الاجتماعية و الصحية</option>
+                        <option value="بابل/ اللجنة الفرعية الثانية">بابل/ اللجنة الفرعية الثانية</option>
+                        <option value="بابل/ مكتب شهداء القاسم">بابل/ مكتب شهداء القاسم</option>
+                        <option value="بابل/ مكتب شهداء ح.غ">بابل/ مكتب شهداء ح.غ</option>
+                        <option value="بابل/ مكتب شهداء المسيب">بابل/ مكتب شهداء المسيب</option>
+                        <option value="بابل/ مكتب شهداء الهاشمية">بابل/ مكتب شهداء الهاشمية</option>
+                        <option value="بابل/ مكتب شهداء ناحية الامام">بابل/ مكتب شهداء ناحية الامام</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="jobGrade">الدرجة الوظيفية:</label>
+                    <input type="text" id="jobGrade" name="jobGrade" placeholder="10\5" pattern="[0-9]+\\[0-9]+" title="يرجى إدخال الدرجة بصيغة رقم\رقم فقط (مثال: 4\5)" required>
+                    <div class="error-message" id="jobGradeError">يرجى إدخال الدرجة بصيغة رقم\رقم فقط (مثال: 10\5)</div>
+                </div>
+                <div class="form-group">
+                    <label for="jobCategory">الفئة / طبيعة العمل:</label>
+                    <select id="jobCategory" name="jobCategory" required>
+                        <option value="">-- اختر الفئة --</option>
+                        <option value="قيادية/اشرافية">وظيفة قيادية/ أشرافية (من معاون مدير عام الى مسؤول شعبة)</option>
+                        <option value="ادارية">وظيفة ادارية تنظيمية/ اعمال ادارية</option>
+                        <option value="فنية">وظيفة فنية (تـقنية، هندسية، حرفية)</option>
+                        <option value="تخصصية">وظيفة تخصصية (مالي، قانوني،أمني،اعلامي)</option>
+                        <option value="ساندة">وظيفة ساندة/ عتال، موزع بريد، ضيافة، خدمات، سائق</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gender">الجنس:</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">-- اختر --</option>
+                        <option value="ذكر">ذكر</option>
+                        <option value="أنثى">أنثى</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label for="education">التحصيل العلمي:</label>
+                    <select id="education" name="education" required>
+                        <option value="">-- اختر --</option>
+                        <option value="دبلوم عالي">دبلوم عالي أو أعلى</option>
+                        <option value="بكالوريوس">بكلوريوس</option>
+                        <option value="دبلوم">دبلوم</option>
+                        <option value="اعدادية">اعدادية</option>
+                        <option value="متوسطة">متوسطة فما دون</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="serviceYears">سنوات الخدمة الفعلية:</label>
+                    <select id="serviceYears" name="serviceYears" required>
+                        <option value="">-- اختر --</option>
+                        <option value="15+">15 سنة فما فوق</option>
+                        <option value="10-15">10 إلى 15 سنة</option>
+                        <option value="5-10">5 إلى 10 سنوات</option>
+                        <option value="1-5">1 إلى 5 سنوات</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>بنية العمل: (يمكن التأشير على أكثر من حقل)</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item"><input type="checkbox" id="workStructure1" name="workStructure" value="ميداني"><label for="workStructure1">ميداني</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="workStructure2" name="workStructure" value="مكتبي"><label for="workStructure2">مكتبي</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="workStructure3" name="workStructure" value="عسكري"><label for="workStructure3">عسكري</label></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <script>
-        // ============================================================
-        // تهيئة Supabase
-        // ============================================================
-        // ⚠️ استبدل هذه القيم بقيم مشروعك من Supabase
-        const SUPABASE_URL = 'https://rbizfvfsbbzfacpwlecn.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiaXpmdmZzYmJ6ZmFjcHdsZWNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODkwNzMsImV4cCI6MjA3Nzc2NTA3M30.CJf9ptptOXyik55H_WUjVDB5F5Ed4xksaFZA_N8qfbg';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        <!-- محاور الاستبيان -->
+        <div class="section">
+            <div class="section-title">محاور استبانة رضا الأطراف المعنية</div>
 
-        // ============================================================
-        // 1. تحديث شريط التقدم
-        // ============================================================
-        function updateProgress() {
-            const form = document.getElementById('jobSatisfactionForm');
-            const totalFields = form.querySelectorAll('input[type="text"], input[type="radio"]:checked, select').length;
-            const filledFields = form.querySelectorAll('input[type="text"][value], input[type="radio"]:checked, select option:checked[value]').length;
+            <!-- القيادة والإدارة -->
+            <div class="form-group">
+                <h3>أولاً: القيادة والإدارة</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">تقوم القيادة والإدارة بإشراك موظفيهما عند اتخاذ قرارات تهم الجميع.</td><td><input type="radio" name="leadership1" value="1" required></td><td><input type="radio" name="leadership1" value="2"></td><td><input type="radio" name="leadership1" value="3"></td><td><input type="radio" name="leadership1" value="4"></td><td><input type="radio" name="leadership1" value="5"></td></tr>
+                        <tr><td style="text-align: right;">تعتمد القيادة او الإدارة مبدأ العدالة في توزيع الامتيازات بين الموظفين.</td><td><input type="radio" name="leadership2" value="1" required></td><td><input type="radio" name="leadership2" value="2"></td><td><input type="radio" name="leadership2" value="3"></td><td><input type="radio" name="leadership2" value="4"></td><td><input type="radio" name="leadership2" value="5"></td></tr>
+                        <tr><td style="text-align: right;">توجد آليـة لدى القيادة والإدارة للتعامل مع التغذيات الراجعة (مقترحات / شكاوى) المقدمة من قبل الموظفين.</td><td><input type="radio" name="leadership3" value="1" required></td><td><input type="radio" name="leadership3" value="2"></td><td><input type="radio" name="leadership3" value="3"></td><td><input type="radio" name="leadership3" value="4"></td><td><input type="radio" name="leadership3" value="5"></td></tr>
+                        <tr><td style="text-align: right;">تتمتع القيادة والإدارة بالمرونة في معالجة الإزمات.</td><td><input type="radio" name="leadership4" value="1" required></td><td><input type="radio" name="leadership4" value="2"></td><td><input type="radio" name="leadership4" value="3"></td><td><input type="radio" name="leadership4" value="4"></td><td><input type="radio" name="leadership4" value="5"></td></tr>
+                        <tr><td style="text-align: right;">تشجع وتثمن القيادة والإدارة الأفكار الإبداعية والابتكار.</td><td><input type="radio" name="leadership5" value="1" required></td><td><input type="radio" name="leadership5" value="2"></td><td><input type="radio" name="leadership5" value="3"></td><td><input type="radio" name="leadership5" value="4"></td><td><input type="radio" name="leadership5" value="5"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- التخطيط الاستراتيجي -->
+            <div class="form-group">
+                <h3>ثانياً: التخطيط الاستراتيجي</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">معرفتك برؤية مؤسستك وغاياتها الاستراتيجية جيدة.</td><td><input type="radio" name="strategy1" value="1" required></td><td><input type="radio" name="strategy1" value="2"></td><td><input type="radio" name="strategy1" value="3"></td><td><input type="radio" name="strategy1" value="4"></td><td><input type="radio" name="strategy1" value="5"></td></tr>
+                        <tr><td style="text-align: right;">يتم اشتراكك بإعداد الأهداف الاستراتيجية في دائرتك.</td><td><input type="radio" name="strategy2" value="1" required></td><td><input type="radio" name="strategy2" value="2"></td><td><input type="radio" name="strategy2" value="3"></td><td><input type="radio" name="strategy2" value="4"></td><td><input type="radio" name="strategy2" value="5"></td></tr>
+                        <tr><td style="text-align: right;">تعرف دورك ومسؤوليتك جيدا في تنفيذ الخطة الاستراتيجية لدائرتك.</td><td><input type="radio" name="strategy3" value="1" required></td><td><input type="radio" name="strategy3" value="2"></td><td><input type="radio" name="strategy3" value="3"></td><td><input type="radio" name="strategy3" value="4"></td><td><input type="radio" name="strategy3" value="5"></td></tr>
+                        <tr><td style="text-align: right;">التوجه الاستراتيجي لمؤسستك متناسب مع متطلباتك وأهدافك وطموحاتك.</td><td><input type="radio" name="strategy4" value="1" required></td><td><input type="radio" name="strategy4" value="2"></td><td><input type="radio" name="strategy4" value="3"></td><td><input type="radio" name="strategy4" value="4"></td><td><input type="radio" name="strategy4" value="5"></td></tr>
+                        <tr><td style="text-align: right;">تطابق الهيكل التنظيمي والوظيفي وفق متطلبات تنفيذ الخطة الاستراتيجية.</td><td><input type="radio" name="strategy5" value="1" required></td><td><input type="radio" name="strategy5" value="2"></td><td><input type="radio" name="strategy5" value="3"></td><td><input type="radio" name="strategy5" value="4"></td><td><input type="radio" name="strategy5" value="5"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- التمكين -->
+            <div class="form-group">
+                <h3>ثالثاً: التمكين</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">يتم تمكين الموظفين في دائرتك بتفويضهم الصلاحيات لأداء المهام.</td><td><input type="radio" name="empowerment1" value="1" required></td><td><input type="radio" name="empowerment1" value="2"></td><td><input type="radio" name="empowerment1" value="3"></td><td><input type="radio" name="empowerment1" value="4"></td><td><input type="radio" name="empowerment1" value="5"></td></tr>
+                        <tr><td style="text-align: right;">يتطلب القيام بالمهام المناطة بك سلسلة إجراءات وموافقات إدارية طويلة.</td><td><input type="radio" name="empowerment2" value="1" required></td><td><input type="radio" name="empowerment2" value="2"></td><td><input type="radio" name="empowerment2" value="3"></td><td><input type="radio" name="empowerment2" value="4"></td><td><input type="radio" name="empowerment2" value="5"></td></tr>
+                        <tr><td style="text-align: right;">يتم تزويدك بكافة المعلومات التي تحتاجها لأداء عملك بصورة دقيقة.</td><td><input type="radio" name="empowerment3" value="1" required></td><td><input type="radio" name="empowerment3" value="2"></td><td><input type="radio" name="empowerment3" value="3"></td><td><input type="radio" name="empowerment3" value="4"></td><td><input type="radio" name="empowerment3" value="5"></td></tr>
+                        <tr><td style="text-align: right;">تقييم قابليات الأفراد الممكّـنين في تقديمهم المعلومات الصحيحة واستعدادهم لتحمل المسؤولية.</td><td><input type="radio" name="empowerment4" value="1" required></td><td><input type="radio" name="empowerment4" value="2"></td><td><input type="radio" name="empowerment4" value="3"></td><td><input type="radio" name="empowerment4" value="4"></td><td><input type="radio" name="empowerment4" value="5"></td></tr>
+                        <tr><td style="text-align: right;">يتم توزيع الفرص التدريبية لتطوير المهارات بشكل عادل وشفاف لجميع الموظفين في دائرتك.</td><td><input type="radio" name="empowerment5" value="1" required></td><td><input type="radio" name="empowerment5" value="2"></td><td><input type="radio" name="empowerment5" value="3"></td><td><input type="radio" name="empowerment5" value="4"></td><td><input type="radio" name="empowerment5" value="5"></td></tr>
+                        <tr><td style="text-align: right;">توفر دائرتك المستلزمات المطلوبة للقيام بمهامك (حاسبات، وسائل نقل، أثاث، انترنت، قرطاسية، الخ).</td><td><input type="radio" name="empowerment6" value="1" required></td><td><input type="radio" name="empowerment6" value="2"></td><td><input type="radio" name="empowerment6" value="3"></td><td><input type="radio" name="empowerment6" value="4"></td><td><input type="radio" name="empowerment6" value="5"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- التحفيز -->
+            <div class="form-group">
+                <h3>رابعاً: التحفيز (الدافعية)</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">تشعر عند تقديمك لعمل متميز أو فكرة إبداعية بأنه سوف يتم التقدير والثناء عليك.</td><td><input type="radio" name="motivation1" value="1" required></td><td><input type="radio" name="motivation1" value="2"></td><td><input type="radio" name="motivation1" value="3"></td><td><input type="radio" name="motivation1" value="4"></td><td><input type="radio" name="motivation1" value="5"></td></tr>
+                        <tr><td style="text-align: right;">بيئة عملك تشجع على التفاعل مع الموظفين والعمل بروح الفريق.</td><td><input type="radio" name="motivation2" value="1" required></td><td><input type="radio" name="motivation2" value="2"></td><td><input type="radio" name="motivation2" value="3"></td><td><input type="radio" name="motivation2" value="4"></td><td><input type="radio" name="motivation2" value="5"></td></tr>
+                        <tr><td style="text-align: right;">يتم التعامل مع أخطائك في العمل بعيداً عن اللوم والنقد السلبي.</td><td><input type="radio" name="motivation3" value="1" required></td><td><input type="radio" name="motivation3" value="2"></td><td><input type="radio" name="motivation3" value="3"></td><td><input type="radio" name="motivation3" value="4"></td><td><input type="radio" name="motivation3" value="5"></td></tr>
+                        <tr><td style="text-align: right;">إن منح لقب (الموظف المتميز أو الموظف المثالي) يرفع من الروح التنافسية والدافعية والتحفيز للموظفين (عند اعتماد معايير مهنية).</td><td><input type="radio" name="motivation4" value="1" required></td><td><input type="radio" name="motivation4" value="2"></td><td><input type="radio" name="motivation4" value="3"></td><td><input type="radio" name="motivation4" value="4"></td><td><input type="radio" name="motivation4" value="5"></td></tr>
+                        <tr><td style="text-align: right;">إن منح المكافآت المادية يرفع من دافعية الموظفين للعمل.</td><td><input type="radio" name="motivation5" value="1" required></td><td><input type="radio" name="motivation5" value="2"></td><td><input type="radio" name="motivation5" value="3"></td><td><input type="radio" name="motivation5" value="4"></td><td><input type="radio" name="motivation5" value="5"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- الولاء والانتماء -->
+            <div class="form-group">
+                <h3>خامساً: الولاء والأنتماء الوظيفي</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">تهتم مؤسستك بتخفيف ضغوطات العمل عليك آخذة بنظر الاعتبار أعباء الحياة.</td><td><input type="radio" name="loyalty1" value="1" required></td><td><input type="radio" name="loyalty1" value="2"></td><td><input type="radio" name="loyalty1" value="3"></td><td><input type="radio" name="loyalty1" value="4"></td><td><input type="radio" name="loyalty1" value="5"></td></tr>
+                        <tr><td style="text-align: right;">أنت تشعر بالحماس عند القيام بعملك.</td><td><input type="radio" name="loyalty2" value="1" required></td><td><input type="radio" name="loyalty2" value="2"></td><td><input type="radio" name="loyalty2" value="3"></td><td><input type="radio" name="loyalty2" value="4"></td><td><input type="radio" name="loyalty2" value="5"></td></tr>
+                        <tr><td style="text-align: right;">عند السؤال عن مؤسستك تقوم بمدحها والإشادة بدورها في البلد.</td><td><input type="radio" name="loyalty3" value="1" required></td><td><input type="radio" name="loyalty3" value="2"></td><td><input type="radio" name="loyalty3" value="3"></td><td><input type="radio" name="loyalty3" value="4"></td><td><input type="radio" name="loyalty3" value="5"></td></tr>
+                        <tr><td style="text-align: right;">في حال تعرضت مؤسستك لأزمة فأنت تشعر أنك جزء منها وتشارك في حلها بأي طريقة متاحة لك.</td><td><input type="radio" name="loyalty4" value="1" required></td><td><input type="radio" name="loyalty4" value="2"></td><td><input type="radio" name="loyalty4" value="3"></td><td><input type="radio" name="loyalty4" value="4"></td><td><input type="radio" name="loyalty4" value="5"></td></tr>
+                        <tr><td style="text-align: right;">مستقبلك في مؤسستك آمن ولا يوجد قلق من تخليها عنك.</td><td><input type="radio" name="loyalty5" value="1" required></td><td><input type="radio" name="loyalty5" value="2"></td><td><input type="radio" name="loyalty5" value="3"></td><td><input type="radio" name="loyalty5" value="4"></td><td><input type="radio" name="loyalty5" value="5"></td></tr>
+                        <tr><td style="text-align: right;">رد الجميل لك عند قيامك بعمل مميز يعزز من انتمائك للمؤسسة.</td><td><input type="radio" name="loyalty6" value="1" required></td><td><input type="radio" name="loyalty6" value="2"></td><td><input type="radio" name="loyalty6" value="3"></td><td><input type="radio" name="loyalty6" value="4"></td><td><input type="radio" name="loyalty6" value="5"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- الاستحقاق الوظيفي -->
+            <div class="form-group">
+                <h3>سادساً: الاستحقاق الوظيفي</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">يقوم مديرك بإزالة عوامل المحسوبية والمحاباة عند تعامله مع الموظفين.</td><td><input type="radio" name="entitlement1" value="1" required></td><td><input type="radio" name="entitlement1" value="2"></td><td><input type="radio" name="entitlement1" value="3"></td><td><input type="radio" name="entitlement1" value="4"></td><td><input type="radio" name="entitlement1" value="5"></td></tr>
+                        <tr><td style="text-align: right;">يقوم مديرك المباشر بمناقشتك بنتائج تقييم أدائك الفصلية والسنوية.</td><td><input type="radio" name="entitlement2" value="1" required></td><td><input type="radio" name="entitlement2" value="2"></td><td><input type="radio" name="entitlement2" value="3"></td><td><input type="radio" name="entitlement2" value="4"></td><td><input type="radio" name="entitlement2" value="5"></td></tr>
+                        <tr><td style="text-align: right;">معرفتك بحقوقك وواجباتك الوظيفية جيدة.</td><td><input type="radio" name="entitlement3" value="1" required></td><td><input type="radio" name="entitlement3" value="2"></td><td><input type="radio" name="entitlement3" value="3"></td><td><input type="radio" name="entitlement3" value="4"></td><td><input type="radio" name="entitlement3" value="5"></td></tr>
+                        <tr><td style="text-align: right;">انسيابية إجراءات الترفيع والترقية.</td><td><input type="radio" name="entitlement4" value="1" required></td><td><input type="radio" name="entitlement4" value="2"></td><td><input type="radio" name="entitlement4" value="3"></td><td><input type="radio" name="entitlement4" value="4"></td><td><input type="radio" name="entitlement4" value="5"></td></tr>
+                        <tr><td style="text-align: right;">يتم توزيع الاستحقاقات الوظيفية بشكل عادل (إجازات، تفرغ دراسي، أمومة، مخصصات مهنية الخ).</td><td><input type="radio" name="entitlement5" value="1" required></td><td><input type="radio" name="entitlement5" value="2"></td><td><input type="radio" name="entitlement5" value="3"></td><td><input type="radio" name="entitlement5" value="4"></td><td><input type="radio" name="entitlement5" value="5"></td></tr>
+                        <tr><td style="text-align: right;">هناك توازن ما بين العقوبة المفروضة على الموظف ونوع المخالفة.</td><td><input type="radio" name="entitlement6" value="1" required></td><td><input type="radio" name="entitlement6" value="2"></td><td><input type="radio" name="entitlement6" value="3"></td><td><input type="radio" name="entitlement6" value="4"></td><td><input type="radio" name="entitlement6" value="5"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- التواصل -->
+            <div class="form-group">
+                <h3>سابعاً: التواصل</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">تواصلك مع مديرك لمناقشة أمور العمل يتم بشكل سلس (اعتماد سياسة الباب المفتوح).</td>
+                            <td><input type="radio" name="communication1" value="1" required></td>
+                            <td><input type="radio" name="communication1" value="2"></td>
+                            <td><input type="radio" name="communication1" value="3"></td>
+                            <td><input type="radio" name="communication1" value="4"></td>
+                            <td><input type="radio" name="communication1" value="5"></td>
+                        </tr>
+                        <tr><td style="text-align: right;">يزور مديرك موقع عملك للاطمئنان على توفير متطلباتك وآلية سير العمل.</td>
+                            <td><input type="radio" name="communication2" value="1" required></td>
+                            <td><input type="radio" name="communication2" value="2"></td>
+                            <td><input type="radio" name="communication2" value="3"></td>
+                            <td><input type="radio" name="communication2" value="4"></td>
+                            <td><input type="radio" name="communication2" value="5"></td>
+                        </tr>
+                        <tr><td style="text-align: right;">يعطيك مديرك تغذية راجعة عن دورك وفاعليتك في العمل فأنت لست مضطراً لتخمين ما يدور في ذهنه.</td>
+                            <td><input type="radio" name="communication3" value="1" required></td>
+                            <td><input type="radio" name="communication3" value="2"></td>
+                            <td><input type="radio" name="communication3" value="3"></td>
+                            <td><input type="radio" name="communication3" value="4"></td>
+                            <td><input type="radio" name="communication3" value="5"></td>
+                        </tr>
+                        <tr><td style="text-align: right;">التواصل والتعاون بين موظفي دائرتك فاعل.</td>
+                            <td><input type="radio" name="communication4" value="1" required></td>
+                            <td><input type="radio" name="communication4" value="2"></td>
+                            <td><input type="radio" name="communication4" value="3"></td>
+                            <td><input type="radio" name="communication4" value="4"></td>
+                            <td><input type="radio" name="communication4" value="5"></td>
+                        </tr>
+                        <tr><td style="text-align: right;">أسهمت التكنولوجيا برفع مستوى التواصل بينك وبين مديرك والآخرين.</td>
+                            <td><input type="radio" name="communication5" value="1" required></td>
+                            <td><input type="radio" name="communication5" value="2"></td>
+                            <td><input type="radio" name="communication5" value="3"></td>
+                            <td><input type="radio" name="communication5" value="4"></td>
+                            <td><input type="radio" name="communication5" value="5"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- السلوك الوظيفي -->
+            <div class="form-group">
+                <h3>ثامناً: السلوك الوظيفي</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">يلتزم موظفو مؤسستك بالحياد اتجاه الآخرين ولا يتم التمييز على أساس الجنس أو الدين أو القومية أو المعتقد.</td>
+                            <td><input type="radio" name="behavior1" value="1" required></td>
+                            <td><input type="radio" name="behavior1" value="2"></td>
+                            <td><input type="radio" name="behavior1" value="3"></td>
+                            <td><input type="radio" name="behavior1" value="4"></td>
+                            <td><input type="radio" name="behavior1" value="5"></td>
+                        </tr>
+                        <tr><td style="text-align: right;">يمتنع موظفو مؤسستك عن ممارسة تصرفات أو أمور تنتهك السلوك والآداب الوظيفية.</td>
+                            <td><input type="radio" name="behavior2" value="1" required></td>
+                            <td><input type="radio" name="behavior2" value="2"></td>
+                            <td><input type="radio" name="behavior2" value="3"></td>
+                            <td><input type="radio" name="behavior2" value="4"></td>
+                            <td><input type="radio" name="behavior2" value="5"></td>
+                        </tr>
+                        <tr><td style="text-align: right;">يحترم موظفو مؤسستك القوانين والتعليمات والأنظمة النافذة.</td>
+                            <td><input type="radio" name="behavior3" value="1" required></td>
+                            <td><input type="radio" name="behavior3" value="2"></td>
+                            <td><input type="radio" name="behavior3" value="3"></td>
+                            <td><input type="radio" name="behavior3" value="4"></td>
+                            <td><input type="radio" name="behavior3" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">توجد جهة رقابـية تتابع تنفيذ القوانين والتعليمات والأنظمة وتحاسب مخالفيها.</td>
+                            <td><input type="radio" name="behavior4" value="1" required></td>
+                            <td><input type="radio" name="behavior4" value="2"></td>
+                            <td><input type="radio" name="behavior4" value="3"></td>
+                            <td><input type="radio" name="behavior4" value="4"></td>
+                            <td><input type="radio" name="behavior4" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">يحافظ موظفو مؤسستك على سرية المعلومات التي لا يفترض إعلانها خارج المؤسسة.</td>
+                            <td><input type="radio" name="behavior5" value="1" required></td>
+                            <td><input type="radio" name="behavior5" value="2"></td>
+                            <td><input type="radio" name="behavior5" value="3"></td>
+                            <td><input type="radio" name="behavior5" value="4"></td>
+                            <td><input type="radio" name="behavior5" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">يتعامل موظفو مؤسستك مع مسؤوليهم عبر أساليب تبتعد عن التملّق والمحسوبية.</td>
+                            <td><input type="radio" name="behavior6" value="1" required></td>
+                            <td><input type="radio" name="behavior6" value="2"></td>
+                            <td><input type="radio" name="behavior6" value="3"></td>
+                            <td><input type="radio" name="behavior6" value="4"></td>
+                            <td><input type="radio" name="behavior6" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">ارتداء الزي الرسمي لموظفي مؤسستك يعكس صورة إيجابية عنها.</td>
+                            <td><input type="radio" name="behavior7" value="1" required></td>
+                            <td><input type="radio" name="behavior7" value="2"></td>
+                            <td><input type="radio" name="behavior7" value="3"></td>
+                            <td><input type="radio" name="behavior7" value="4"></td>
+                            <td><input type="radio" name="behavior7" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">يحافظ موظفو مؤسستك على الممتلكات العامة ولا يستخدمونها لأغراض شخصية.</td>
+                            <td><input type="radio" name="behavior8" value="1" required></td>
+                            <td><input type="radio" name="behavior8" value="2"></td>
+                            <td><input type="radio" name="behavior8" value="3"></td>
+                            <td><input type="radio" name="behavior8" value="4"></td>
+                            <td><input type="radio" name="behavior8" value="5"></td>
+                         </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- السلامة والصحة -->
+            <div class="form-group">
+                <h3>تاسعاً: السلامة والصحة المهنية والبيئة</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">معرفتي جيدة بالتعليمات الخاصة بالسلامة والصحة المهنية والبيئة.</td>
+                            <td><input type="radio" name="safety1" value="1" required></td>
+                            <td><input type="radio" name="safety1" value="2"></td>
+                            <td><input type="radio" name="safety1" value="3"></td>
+                            <td><input type="radio" name="safety1" value="4"></td>
+                            <td><input type="radio" name="safety1" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">عمليات الإخلاء ساهمت بنشر الوعي بتعليمات السلامة والصحة المهنية.</td>
+                            <td><input type="radio" name="safety2" value="1" required></td>
+                            <td><input type="radio" name="safety2" value="2"></td>
+                            <td><input type="radio" name="safety2" value="3"></td>
+                            <td><input type="radio" name="safety2" value="4"></td>
+                            <td><input type="radio" name="safety2" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">بيئة عملك (المكتب - التهوية - الإضاءة - ... الخ) جيدة.</td>
+                            <td><input type="radio" name="safety3" value="1" required></td>
+                            <td><input type="radio" name="safety3" value="2"></td>
+                            <td><input type="radio" name="safety3" value="3"></td>
+                            <td><input type="radio" name="safety3" value="4"></td>
+                            <td><input type="radio" name="safety3" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">لمنسقي السلامة والصحة المهنية والبيئة في دائرتك دور كبير في الاطلاع عن مخاطر العمل و نشر الوعي الصحي والمهني والبيئي.</td>
+                            <td><input type="radio" name="safety4" value="1" required></td>
+                            <td><input type="radio" name="safety4" value="2"></td>
+                            <td><input type="radio" name="safety4" value="3"></td>
+                            <td><input type="radio" name="safety4" value="4"></td>
+                            <td><input type="radio" name="safety4" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">يلتزم موظفو مؤسستك بشروط السلامة والصحة المهنية والبيئة.</td>
+                            <td><input type="radio" name="safety5" value="1" required></td>
+                            <td><input type="radio" name="safety5" value="2"></td>
+                            <td><input type="radio" name="safety5" value="3"></td>
+                            <td><input type="radio" name="safety5" value="4"></td>
+                            <td><input type="radio" name="safety5" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">يغطي صندوق الإسعافات الأولية بالحاجات الضرورية.</td>
+                            <td><input type="radio" name="safety6" value="1" required></td>
+                            <td><input type="radio" name="safety6" value="2"></td>
+                            <td><input type="radio" name="safety6" value="3"></td>
+                            <td><input type="radio" name="safety6" value="4"></td>
+                            <td><input type="radio" name="safety6" value="5"></td>
+                         </tr>
+                    </tbody>
+                </table>
+            </div>    
             
-            const progress = (filledFields / totalFields) * 100;
-            document.getElementById('progress-bar').style.width = progress + '%';
-        }
-
-        document.querySelectorAll('input, select').forEach(el => {
-            el.addEventListener('change', updateProgress);
-            el.addEventListener('input', updateProgress);
-        });
-
-        // ============================================================
-        // 2. التحقق من صيغة الدرجة الوظيفية
-        // ============================================================
-        document.getElementById('jobGrade').addEventListener('input', function(e) {
-            this.value = this.value.replace(/[^0-9\s\\]/g, '');
-            const backslashCount = (this.value.match(/\\/g) || []).length;
-            if (backslashCount > 1) {
-                this.value = this.value.replace(/\\+$/, '');
-            }
-            this.style.direction = 'ltr';
-            this.style.textAlign = 'right';
-        });
-
-        // ============================================================
-        // 3. جمع بيانات الاستبيان
-        // ============================================================
-        function collectFormData() {
-            const form = document.getElementById('jobSatisfactionForm');
-            const formData = new FormData(form);
-            const data = {};
-
-            data.department = formData.get('department') || '';
-            data.jobGrade = formData.get('jobGrade') || '';
-
-            const jobTypes = [];
-            document.querySelectorAll('input[name="jobType"]:checked').forEach(el => {
-                jobTypes.push(el.value);
-            });
-            data.jobType = jobTypes.join(', ');
-
-            const workStructures = [];
-            document.querySelectorAll('input[name="workStructure"]:checked').forEach(el => {
-                workStructures.push(el.value);
-            });
-            data.workStructure = workStructures.join(', ');
-
-            data.serviceYears = formData.get('serviceYears') || '';
-            data.gender = formData.get('gender') || '';
-            data.education = formData.get('education') || '';
-
-            data.priority1 = formData.get('priority1') || '';
-            data.priority2 = formData.get('priority2') || '';
-            data.priority3 = formData.get('priority3') || '';
-            data.priority4 = formData.get('priority4') || '';
-            data.priority5 = formData.get('priority5') || '';
-            data.suggestions = formData.get('suggestions') || '';
-
-            // المحاور العشرة
-            const axes = [
-                'leadership', 'strategy', 'empowerment', 'motivation', 
-                'loyalty', 'entitlement', 'communication', 'behavior', 
-                'safety', 'moral'
-            ];
-
-            axes.forEach(axis => {
-                // كل محور له 5-8 أسئلة
-                const maxQ = axis === 'leadership' || axis === 'strategy' || 
-                           axis === 'motivation' || axis === 'communication' ? 5 : 
-                           axis === 'empowerment' || axis === 'loyalty' || 
-                           axis === 'entitlement' ? 6 : 
-                           axis === 'behavior' ? 8 : 
-                           axis === 'safety' ? 6 : 4;
-                
-                for (let i = 1; i <= maxQ; i++) {
-                    const val = formData.get(`${axis}${i}`);
-                    if (val) {
-                        data[`${axis}${i}`] = parseInt(val);
-                    }
-                }
-            });
-
-            return data;
-        }
-
-        // ============================================================
-        // 4. إرسال الاستبيان (حفظ في Supabase)
-        // ============================================================
-        document.getElementById('submitBtn').addEventListener('click', async function(e) {
-            e.preventDefault();
+            <div style="page-break-before: always; break-before: page;"></div>
             
-            const data = collectFormData();
-            const successAlert = document.getElementById('success-alert');
-            const errorAlert = document.getElementById('error-alert');
+            <!-- الجانب المعنوي -->
+            <div class="form-group">
+                <h3>عاشراً: الجانب المعنوي</h3>
+                <table class="rating-table">
+                    <thead><tr><th style="width: 60%;">العبارة</th><th>غير راضي</th><th>غير راضي إلى حد ما</th><th>محايد</th><th>راضي إلى حد ما</th><th>راضي جداً</th></tr></thead>
+                    <tbody>
+                        <tr><td style="text-align: right;">إجراءات التفتيش الحالية وانسيابية للدخول للمؤسسة جيدة.</td>
+                            <td><input type="radio" name="moral1" value="1" required></td>
+                            <td><input type="radio" name="moral1" value="2"></td>
+                            <td><input type="radio" name="moral1" value="3"></td>
+                            <td><input type="radio" name="moral1" value="4"></td>
+                            <td><input type="radio" name="moral1" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">تهتم مؤسستك بالأواصر والعلاقات الاجتماعية لما لها الأثر الإيجابي في رفع الروح المعنوية في العمل.</td>
+                            <td><input type="radio" name="moral2" value="1" required></td>
+                            <td><input type="radio" name="moral2" value="2"></td>
+                            <td><input type="radio" name="moral2" value="3"></td>
+                            <td><input type="radio" name="moral2" value="4"></td>
+                            <td><input type="radio" name="moral2" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">يتم الأخذ بنظر الاعتبار النوع الاجتماعي/الجنس عند توزيع الامتيازات والأدوار في دائرتك.</td>
+                            <td><input type="radio" name="moral3" value="1" required></td>
+                            <td><input type="radio" name="moral3" value="2"></td>
+                            <td><input type="radio" name="moral3" value="3"></td>
+                            <td><input type="radio" name="moral3" value="4"></td>
+                            <td><input type="radio" name="moral3" value="5"></td>
+                         </tr>
+                        <tr><td style="text-align: right;">تتسم العلاقات بين الموظفين ومسؤوليهم في دائرتك بالثقة والاحترام المتبادل.</td>
+                            <td><input type="radio" name="moral4" value="1" required></td>
+                            <td><input type="radio" name="moral4" value="2"></td>
+                            <td><input type="radio" name="moral4" value="3"></td>
+                            <td><input type="radio" name="moral4" value="4"></td>
+                            <td><input type="radio" name="moral4" value="5"></td>
+                         </tr>
+                    </tbody>
+                </table>
+            </div>
 
-            // التحقق من وجود اسم التشكيل
-            if (!data.department) {
-                errorAlert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> يرجى اختيار اسم الدائرة / التشكيل';
-                errorAlert.style.display = 'block';
-                setTimeout(() => errorAlert.style.display = 'none', 3000);
-                return;
+            <!-- أولويات التأثير المعنوي -->
+            <div class="form-group">
+                <h3>أولويات التأثير المعنوي</h3>
+                <p>أي من القضايا التالية يعتقد بأن لها أثر إيجابي معنوي لديك لتأدية العمل (اذكر اجابتك برقم يعبر عن الأولوية حيث ان رقم (1) هو أدنى قيمة والرقم (5) هو اعلى قيمة).</p>
+                <div class="priority-row">
+                    <div class="priority-item"><label for="priority1">وسائل النقل:</label><select id="priority1" name="priority1" required><option value="">اختر</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                    <div class="priority-item"><label for="priority2">كافتريا:</label><select id="priority2" name="priority2" required><option value="">اختر</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                    <div class="priority-item"><label for="priority3">الحضانة والروضة:</label><select id="priority3" name="priority3" required><option value="">اختر</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                    <div class="priority-item"><label for="priority4">قاعة رياضية:</label><select id="priority4" name="priority4" required><option value="">اختر</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                    <div class="priority-item"><label for="priority5">برامج ترفيهية - مسابقات:</label><select id="priority5" name="priority5" required><option value="">اختر</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                </div>
+            </div>
+
+            <!-- المقترحات والأفكار -->
+            <div class="form-group">
+                <h3>المقترحات والأفكار:</h3>
+                <textarea id="suggestions" name="suggestions" rows="3" placeholder="يرجى كتابة مقترحاتك وأفكارك هنا..."></textarea>
+            </div>
+        </div>
+
+        <div class="button-group no-print">
+            <button type="button" class="btn btn-secondary" onclick="window.print()">طباعة</button>
+            <button type="submit" class="btn" id="submitBtn">إرسال الاستبيان</button>
+            <button type="button" class="btn btn-clear" id="clearButton">مسح البيانات</button>
+        </div>
+    </form>
+</div>
+
+<script>
+(function() {
+    const supabaseUrl = 'https://rbizfvfsbbzfacpwlecn.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJiaXpmdmZzYmJ6ZmFjcHdsZWNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODkwNzMsImV4cCI6MjA3Nzc2NTA3M30.CJf9ptptOXyik55H_WUjVDB5F5Ed4xksaFZA_N8qfbg';
+    const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
+    
+    let isSending = false;
+    let alreadySent = false;
+    
+    const form = document.getElementById('jobSatisfactionForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearButton');
+    
+    if (!form || !submitBtn || !clearBtn) {
+        console.error('بعض العناصر غير موجودة');
+        return;
+    }
+    
+    // ============================================================
+    // دالة لجمع جميع بيانات الاستبيان (المحاور العشرة)
+    // ============================================================
+    function collectAllFormData() {
+        const formData = new FormData(form);
+        const data = {};
+
+        // البيانات التعريفية
+        data.department = formData.get('department') || '';
+        data.jobGrade = formData.get('jobGrade') || '';
+        data.jobCategory = formData.get('jobCategory') || '';
+        data.gender = formData.get('gender') || '';
+        data.education = formData.get('education') || '';
+        data.serviceYears = formData.get('serviceYears') || '';
+
+        // بنية العمل (checkbox)
+        const workStructures = [];
+        document.querySelectorAll('input[name="workStructure"]:checked').forEach(el => {
+            workStructures.push(el.value);
+        });
+        data.workStructure = workStructures.join(', ');
+
+        // المحاور العشرة
+        const axes = {
+            leadership: 5,
+            strategy: 5,
+            empowerment: 6,
+            motivation: 5,
+            loyalty: 6,
+            entitlement: 6,
+            communication: 5,
+            behavior: 8,
+            safety: 6,
+            moral: 4
+        };
+
+        Object.keys(axes).forEach(axis => {
+            for (let i = 1; i <= axes[axis]; i++) {
+                const val = formData.get(`${axis}${i}`);
+                data[`${axis}${i}`] = val ? parseInt(val) : null;
             }
-
-            // تعطيل الزر وإظهار حالة التحميل
-            this.disabled = true;
-            this.innerHTML = '<span class="loading-spinner"></span> جاري الإرسال...';
-
-            try {
-                // حفظ في Supabase
-                const { data: result, error } = await supabase
-                    .from('job_satisfaction_surveys')
-                    .insert([{
-                        department: data.department,
-                        job_grade: data.jobGrade,
-                        job_type: data.jobType,
-                        work_structure: data.workStructure,
-                        service_years: data.serviceYears,
-                        gender: data.gender,
-                        education: data.education,
-                        priority1: data.priority1,
-                        priority2: data.priority2,
-                        priority3: data.priority3,
-                        priority4: data.priority4,
-                        priority5: data.priority5,
-                        suggestions: data.suggestions,
-                        // المحاور العشرة
-                        leadership1: data.leadership1 || null,
-                        leadership2: data.leadership2 || null,
-                        leadership3: data.leadership3 || null,
-                        leadership4: data.leadership4 || null,
-                        leadership5: data.leadership5 || null,
-                        strategy1: data.strategy1 || null,
-                        strategy2: data.strategy2 || null,
-                        strategy3: data.strategy3 || null,
-                        strategy4: data.strategy4 || null,
-                        strategy5: data.strategy5 || null,
-                        empowerment1: data.empowerment1 || null,
-                        empowerment2: data.empowerment2 || null,
-                        empowerment3: data.empowerment3 || null,
-                        empowerment4: data.empowerment4 || null,
-                        empowerment5: data.empowerment5 || null,
-                        empowerment6: data.empowerment6 || null,
-                        motivation1: data.motivation1 || null,
-                        motivation2: data.motivation2 || null,
-                        motivation3: data.motivation3 || null,
-                        motivation4: data.motivation4 || null,
-                        motivation5: data.motivation5 || null,
-                        loyalty1: data.loyalty1 || null,
-                        loyalty2: data.loyalty2 || null,
-                        loyalty3: data.loyalty3 || null,
-                        loyalty4: data.loyalty4 || null,
-                        loyalty5: data.loyalty5 || null,
-                        loyalty6: data.loyalty6 || null,
-                        entitlement1: data.entitlement1 || null,
-                        entitlement2: data.entitlement2 || null,
-                        entitlement3: data.entitlement3 || null,
-                        entitlement4: data.entitlement4 || null,
-                        entitlement5: data.entitlement5 || null,
-                        entitlement6: data.entitlement6 || null,
-                        communication1: data.communication1 || null,
-                        communication2: data.communication2 || null,
-                        communication3: data.communication3 || null,
-                        communication4: data.communication4 || null,
-                        communication5: data.communication5 || null,
-                        behavior1: data.behavior1 || null,
-                        behavior2: data.behavior2 || null,
-                        behavior3: data.behavior3 || null,
-                        behavior4: data.behavior4 || null,
-                        behavior5: data.behavior5 || null,
-                        behavior6: data.behavior6 || null,
-                        behavior7: data.behavior7 || null,
-                        behavior8: data.behavior8 || null,
-                        safety1: data.safety1 || null,
-                        safety2: data.safety2 || null,
-                        safety3: data.safety3 || null,
-                        safety4: data.safety4 || null,
-                        safety5: data.safety5 || null,
-                        safety6: data.safety6 || null,
-                        moral1: data.moral1 || null,
-                        moral2: data.moral2 || null,
-                        moral3: data.moral3 || null,
-                        moral4: data.moral4 || null,
-                        submitted_at: new Date().toISOString()
-                    }]);
-
-                if (error) throw error;
-
-                // نجاح
-                successAlert.style.display = 'block';
-                successAlert.innerHTML = '<i class="fas fa-check-circle"></i> تم حفظ الاستبيان في قاعدة البيانات بنجاح!';
-                setTimeout(() => successAlert.style.display = 'none', 4000);
-
-                // إعادة تعيين النموذج
-                document.getElementById('jobSatisfactionForm').reset();
-                document.getElementById('progress-bar').style.width = '0%';
-
-            } catch (error) {
-                console.error('Error saving to Supabase:', error);
-                errorAlert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> حدث خطأ: ' + error.message;
-                errorAlert.style.display = 'block';
-                setTimeout(() => errorAlert.style.display = 'none', 5000);
-            }
-
-            // إعادة تمكين الزر
-            this.disabled = false;
-            this.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الاستبيان';
         });
 
-        // ============================================================
-        // 5. تصدير Excel من Supabase
-        // ============================================================
-        document.getElementById('exportExcel').addEventListener('click', async function() {
-            const alert = document.getElementById('excel-alert');
-            alert.style.display = 'block';
-            alert.innerHTML = '<span class="loading-spinner"></span> جاري تحميل البيانات...';
+        // الأولويات
+        data.priority1 = formData.get('priority1') || '';
+        data.priority2 = formData.get('priority2') || '';
+        data.priority3 = formData.get('priority3') || '';
+        data.priority4 = formData.get('priority4') || '';
+        data.priority5 = formData.get('priority5') || '';
 
-            this.disabled = true;
+        // المقترحات
+        data.suggestions = formData.get('suggestions') || '';
 
-            try {
-                // جلب البيانات من Supabase
-                const { data: records, error } = await supabase
-                    .from('job_satisfaction_surveys')
-                    .select('*')
-                    .order('submitted_at', { ascending: false });
+        return data;
+    }
 
-                if (error) throw error;
+    // ============================================================
+    // إرسال الاستبيان
+    // ============================================================
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (alreadySent) {
+            alert('✅ تم إرسال استبيانك بالفعل! اضغط "مسح البيانات" لبدء استبيان جديد.');
+            return;
+        }
+        
+        if (isSending) {
+            alert('⏳ جاري الإرسال، الرجاء الانتظار...');
+            return;
+        }
+        
+        const dept = document.getElementById('department').value;
+        if (!dept) {
+            alert('⚠️ يرجى اختيار اسم التشكيل');
+            return;
+        }
+        
+        const jobGrade = document.getElementById('jobGrade').value;
+        if (!jobGrade) {
+            alert('⚠️ يرجى إدخال الدرجة الوظيفية');
+            return;
+        }
+        if (!/^[0-9]+\\[0-9]+$/.test(jobGrade)) {
+            alert('⚠️ الدرجة الوظيفية يجب أن تكون بصيغة: رقم\\رقم (مثال: 10\\5)');
+            return;
+        }
+        
+        isSending = true;
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> جاري الإرسال...';
+        
+        try {
+            // ============================================================
+            // 1. جمع جميع بيانات الاستبيان
+            // ============================================================
+            const surveyData = collectAllFormData();
 
-                if (!records || records.length === 0) {
-                    alert.innerHTML = '<i class="fas fa-info-circle"></i> لا توجد بيانات في قاعدة البيانات';
-                    setTimeout(() => alert.style.display = 'none', 3000);
-                    this.disabled = false;
-                    return;
-                }
-
-                // ============================================================
-                // 5.1 إعداد رؤوس الأعمدة
-                // ============================================================
-                const headers = [
-                    'اسم الدائرة / التشكيل',
-                    'الدرجة الوظيفية (د\\م)',
-                    'وظيفة قيادية/اشرافية',
-                    'وظيفة إدارية تنظيمية',
-                    'وظيفة فنية',
-                    'وظيفة تخصصية',
-                    'وظيفة ساندة',
-                    'ميداني',
-                    'مكتبي',
-                    'أمني',
-                    'عسكري',
-                    'من 15 سنة فما فوق',
-                    'من 10 إلى 15 سنة',
-                    'من 5 إلى 10 سنوات',
-                    'أقل من 5 سنوات',
-                    'أنثى',
-                    'ذكر',
-                    'دبلوم عالي أو أعلى',
-                    'بكالوريوس',
-                    'دبلوم',
-                    'أعدادية',
-                    'متوسطة فما دون'
-                ];
-
-                // المحاور العشرة
-                const axes = [
-                    { name: 'القيادة والإدارة', prefix: 'leadership', count: 5 },
-                    { name: 'التخطيط الاستراتيجي', prefix: 'strategy', count: 5 },
-                    { name: 'التمكين', prefix: 'empowerment', count: 6 },
-                    { name: 'التحفيز (الدافعية)', prefix: 'motivation', count: 5 },
-                    { name: 'الولاء والانتماء الوظيفي', prefix: 'loyalty', count: 6 },
-                    { name: 'الاستحقاق الوظيفي', prefix: 'entitlement', count: 6 },
-                    { name: 'التواصل', prefix: 'communication', count: 5 },
-                    { name: 'السلوك الوظيفي', prefix: 'behavior', count: 8 },
-                    { name: 'السلامة والصحة المهنية', prefix: 'safety', count: 6 },
-                    { name: 'الجانب المعنوي', prefix: 'moral', count: 4 }
-                ];
-
-                axes.forEach(axis => {
-                    for (let i = 1; i <= axis.count; i++) {
-                        headers.push(`${axis.name} - السؤال ${i}`);
-                    }
-                });
-
-                // الأولويات والمقترحات
-                headers.push('وسائل النقل');
-                headers.push('كافتيريا');
-                headers.push('الحضانة والروضة');
-                headers.push('قاعة رياضية');
-                headers.push('برامج ترفيهية - مسابقات');
-                headers.push('المقترحات والأفكار');
-                headers.push('تاريخ الإرسال');
-
-                // ============================================================
-                // 5.2 بناء البيانات
-                // ============================================================
-                const excelData = [headers];
-
-                records.forEach(record => {
-                    const row = [];
-
-                    // البيانات الأساسية
-                    row.push(record.department || '');
-                    row.push(record.job_grade || '');
-
-                    // الفئات الوظيفية
-                    const jobTypes = ['قيادية/اشرافية', 'ادارية', 'تخصصية', 'ساندة'];
-                    jobTypes.forEach(type => {
-                        row.push(record.job_type && record.job_type.includes(type) ? 1 : 0);
-                    });
-
-                    // بنية العمل
-                    const workTypes = ['ميداني', 'عسكري'];
-                    workTypes.forEach(type => {
-                        row.push(record.work_structure && record.work_structure.includes(type) ? 1 : 0);
-                    });
-
-                    // سنوات الخدمة
-                    const services = ['15+', '10-15', '5-10', '1-5'];
-                    services.forEach(s => {
-                        row.push(record.service_years === s ? 1 : 0);
-                    });
-
-                    // الجنس
-                    row.push(record.gender === 'أنثى' ? 1 : 0);
-                    row.push(record.gender === 'ذكر' ? 1 : 0);
-
-                    // التحصيل العلمي
-                    const eduLevels = ['دبلوم عالي', 'بكالوريوس', 'دبلوم', 'اعدادية', 'متوسطة'];
-                    eduLevels.forEach(edu => {
-                        row.push(record.education === edu ? 1 : 0);
-                    });
-
-                    // المحاور العشرة
-                    axes.forEach(axis => {
-                        for (let i = 1; i <= axis.count; i++) {
-                            const val = record[`${axis.prefix}${i}`];
-                            row.push(val !== null && val !== undefined ? val : '');
-                        }
-                    });
-
+            // ============================================================
+            // 2. حفظ في جدول job_satisfaction_surveys (جميع المحاور العشرة)
+            // ============================================================
+            const { error: insertError } = await sb
+                .from('job_satisfaction_surveys')
+                .insert([{
+                    department: surveyData.department,
+                    job_grade: surveyData.jobGrade,
+                    job_category: surveyData.jobCategory,
+                    gender: surveyData.gender,
+                    education: surveyData.education,
+                    service_years: surveyData.serviceYears,
+                    work_structure: surveyData.workStructure,
+                    
+                    // القيادة والإدارة (5)
+                    leadership1: surveyData.leadership1,
+                    leadership2: surveyData.leadership2,
+                    leadership3: surveyData.leadership3,
+                    leadership4: surveyData.leadership4,
+                    leadership5: surveyData.leadership5,
+                    
+                    // التخطيط الاستراتيجي (5)
+                    strategy1: surveyData.strategy1,
+                    strategy2: surveyData.strategy2,
+                    strategy3: surveyData.strategy3,
+                    strategy4: surveyData.strategy4,
+                    strategy5: surveyData.strategy5,
+                    
+                    // التمكين (6)
+                    empowerment1: surveyData.empowerment1,
+                    empowerment2: surveyData.empowerment2,
+                    empowerment3: surveyData.empowerment3,
+                    empowerment4: surveyData.empowerment4,
+                    empowerment5: surveyData.empowerment5,
+                    empowerment6: surveyData.empowerment6,
+                    
+                    // التحفيز (5)
+                    motivation1: surveyData.motivation1,
+                    motivation2: surveyData.motivation2,
+                    motivation3: surveyData.motivation3,
+                    motivation4: surveyData.motivation4,
+                    motivation5: surveyData.motivation5,
+                    
+                    // الولاء (6)
+                    loyalty1: surveyData.loyalty1,
+                    loyalty2: surveyData.loyalty2,
+                    loyalty3: surveyData.loyalty3,
+                    loyalty4: surveyData.loyalty4,
+                    loyalty5: surveyData.loyalty5,
+                    loyalty6: surveyData.loyalty6,
+                    
+                    // الاستحقاق (6)
+                    entitlement1: surveyData.entitlement1,
+                    entitlement2: surveyData.entitlement2,
+                    entitlement3: surveyData.entitlement3,
+                    entitlement4: surveyData.entitlement4,
+                    entitlement5: surveyData.entitlement5,
+                    entitlement6: surveyData.entitlement6,
+                    
+                    // التواصل (5)
+                    communication1: surveyData.communication1,
+                    communication2: surveyData.communication2,
+                    communication3: surveyData.communication3,
+                    communication4: surveyData.communication4,
+                    communication5: surveyData.communication5,
+                    
+                    // السلوك (8)
+                    behavior1: surveyData.behavior1,
+                    behavior2: surveyData.behavior2,
+                    behavior3: surveyData.behavior3,
+                    behavior4: surveyData.behavior4,
+                    behavior5: surveyData.behavior5,
+                    behavior6: surveyData.behavior6,
+                    behavior7: surveyData.behavior7,
+                    behavior8: surveyData.behavior8,
+                    
+                    // السلامة (6)
+                    safety1: surveyData.safety1,
+                    safety2: surveyData.safety2,
+                    safety3: surveyData.safety3,
+                    safety4: surveyData.safety4,
+                    safety5: surveyData.safety5,
+                    safety6: surveyData.safety6,
+                    
+                    // الجانب المعنوي (4)
+                    moral1: surveyData.moral1,
+                    moral2: surveyData.moral2,
+                    moral3: surveyData.moral3,
+                    moral4: surveyData.moral4,
+                    
                     // الأولويات
-                    row.push(record.priority1 || '');
-                    row.push(record.priority2 || '');
-                    row.push(record.priority3 || '');
-                    row.push(record.priority4 || '');
-                    row.push(record.priority5 || '');
-
+                    priority1: surveyData.priority1,
+                    priority2: surveyData.priority2,
+                    priority3: surveyData.priority3,
+                    priority4: surveyData.priority4,
+                    priority5: surveyData.priority5,
+                    
                     // المقترحات
-                    row.push(record.suggestions || '');
+                    suggestions: surveyData.suggestions,
+                    
+                    submitted_at: new Date().toISOString()
+                }]);
 
-                    // تاريخ الإرسال
-                    row.push(record.submitted_at ? new Date(record.submitted_at).toLocaleString('ar') : '');
+            if (insertError) throw insertError;
 
-                    excelData.push(row);
-                });
-
-                // ============================================================
-                // 5.3 إنشاء المصنف
-                // ============================================================
-                const wb = XLSX.utils.book_new();
-
-                // الورقة الرئيسية
-                const ws = XLSX.utils.aoa_to_sheet(excelData);
-                ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length * 1.5, 12) }));
-                XLSX.utils.book_append_sheet(wb, ws, 'استبانة الرضا الوظيفي');
-
-                // ============================================================
-                // 5.4 ورقة الجرد
-                // ============================================================
-                const inventoryData = [
-                    ['اسم الدائرة/التشكيل', 'المكتملة', 'غير مكتملة', 'الإجمالي']
-                ];
-
-                const deptStats = {};
-                records.forEach(record => {
-                    const dept = record.department || 'غير محدد';
-                    if (!deptStats[dept]) {
-                        deptStats[dept] = { total: 0, complete: 0 };
-                    }
-                    deptStats[dept].total++;
-
-                    // التحقق من اكتمال الاستبيان
-                    let complete = true;
-                    axes.forEach(axis => {
-                        for (let i = 1; i <= axis.count; i++) {
-                            if (record[`${axis.prefix}${i}`] === null || record[`${axis.prefix}${i}`] === undefined) {
-                                complete = false;
-                            }
-                        }
-                    });
-                    if (complete) deptStats[dept].complete++;
-                });
-
-                let totalComplete = 0;
-                let totalIncomplete = 0;
-                let totalAll = 0;
-
-                Object.keys(deptStats).forEach(dept => {
-                    const stats = deptStats[dept];
-                    const incomplete = stats.total - stats.complete;
-                    inventoryData.push([dept, stats.complete, incomplete, stats.total]);
-                    totalComplete += stats.complete;
-                    totalIncomplete += incomplete;
-                    totalAll += stats.total;
-                });
-
-                inventoryData.push(['الإجمالي', totalComplete, totalIncomplete, totalAll]);
-
-                const wsInventory = XLSX.utils.aoa_to_sheet(inventoryData);
-                wsInventory['!cols'] = [{ wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
-                XLSX.utils.book_append_sheet(wb, wsInventory, 'جرد_الاختيارات');
-
-                // ============================================================
-                // 5.5 حفظ الملف
-                // ============================================================
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                const blob = new Blob([wbout], { type: 'application/octet-stream' });
-                saveAs(blob, 'استبانة_الرضا_الوظيفي.xlsx');
-
-                alert.innerHTML = '<i class="fas fa-check-circle"></i> تم تصدير Excel بنجاح! (' + records.length + ' استمارة)';
-                setTimeout(() => alert.style.display = 'none', 3000);
-
-            } catch (error) {
-                console.error('Error exporting Excel:', error);
-                alert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> حدث خطأ: ' + error.message;
-                setTimeout(() => alert.style.display = 'none', 5000);
-            }
-
-            this.disabled = false;
-        });
-
-        // ============================================================
-        // 6. حفظ PDF
-        // ============================================================
-        document.getElementById('savePdf').addEventListener('click', function() {
-            const element = document.getElementById('form-container');
-            const alert = document.getElementById('success-alert');
+            // ============================================================
+            // 3. تحديث جدول الإحصائيات
+            // ============================================================
+            const { data: existing, error: searchError } = await sb
+                .from('الإحصائيات')
+                .select('*')
+                .eq('اسم_التشكيل', dept);
             
-            this.disabled = true;
-            this.innerHTML = '<span class="loading-spinner"></span> جاري إنشاء PDF...';
+            if (searchError) throw searchError;
             
-            const options = {
-                margin: [10, 10, 10, 10],
-                filename: 'استبانة_الرضا_الوظيفي.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(options).from(element).save()
-                .then(() => {
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-file-pdf"></i> حفظ كPDF';
-                })
-                .catch((error) => {
-                    console.error('Error generating PDF:', error);
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-file-pdf"></i> حفظ كPDF';
-                });
-        });
-
-        // ============================================================
-        // 7. طباعة
-        // ============================================================
-        document.getElementById('printForm').addEventListener('click', function() {
-            window.print();
-        });
-
-        // ============================================================
-        // 8. إعادة تعيين
-        // ============================================================
-        document.getElementById('resetForm').addEventListener('click', function() {
-            if (confirm('هل أنت متأكد من أنك تريد إعادة تعيين جميع البيانات؟')) {
-                document.getElementById('jobSatisfactionForm').reset();
-                document.getElementById('progress-bar').style.width = '0%';
+            if (existing && existing.length > 0) {
+                const currentCount = existing[0].عدد_الاستبانات || 0;
+                const { error: updateError } = await sb
+                    .from('الإحصائيات')
+                    .update({ عدد_الاستبانات: currentCount + 1 })
+                    .eq('اسم_التشكيل', dept);
+                if (updateError) throw updateError;
+            } else {
+                const { error: insertStatError } = await sb
+                    .from('الإحصائيات')
+                    .insert([{ اسم_التشكيل: dept, عدد_الاستبانات: 1 }]);
+                if (insertStatError) throw insertStatError;
             }
-        });
-
-        // تحديث التقدم عند التحميل
-        updateProgress();
-    </script>
+            
+            alert('✅ تم إرسال الاستبيان بنجاح! شكراً لمشاركتك.');
+            alreadySent = true;
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
+            submitBtn.innerHTML = '✓ تم الإرسال';
+            
+        } catch (err) {
+            console.error('خطأ:', err);
+            alert('❌ حدث خطأ: ' + err.message + '\n\nيرجى المحاولة مرة أخرى.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            isSending = false;
+        }
+    });
+    
+    // ============================================================
+    // مسح البيانات
+    // ============================================================
+    clearBtn.addEventListener('click', function() {
+        if (confirm('⚠️ هل أنت متأكد من مسح جميع البيانات؟')) {
+            form.reset();
+            alreadySent = false;
+            isSending = false;
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.innerHTML = 'إرسال الاستبيان';
+            alert('🗑️ تم مسح جميع البيانات. يمكنك الآن تعبئة استبيان جديد.');
+        }
+    });
+    
+    // ============================================================
+    // التحقق من صيغة الدرجة الوظيفية
+    // ============================================================
+    document.getElementById('jobGrade').addEventListener('input', function(e) {
+        const errorMsg = document.getElementById('jobGradeError');
+        if (e.target.value && !/^[0-9]+\\[0-9]+$/.test(e.target.value)) {
+            errorMsg.style.display = 'block';
+        } else {
+            errorMsg.style.display = 'none';
+        }
+    });
+    
+    console.log('✅ الاستبيان جاهز للإرسال');
+})();
+</script>
 </body>
 </html>
