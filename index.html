@@ -189,7 +189,7 @@
                         <option value="15+">15 سنة فما فوق</option>
                         <option value="10-15">10 إلى 15 سنة</option>
                         <option value="5-10">5 إلى 10 سنوات</option>
-                        <option value="أقل من 5 سنوات">أقل من 5 سنوات</option>
+                        <option value="1-5">1 إلى 5 سنوات</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -198,13 +198,17 @@
                         <div class="checkbox-item"><input type="checkbox" id="workStructure1" name="workStructure" value="ميداني"><label for="workStructure1">ميداني</label></div>
                         <div class="checkbox-item"><input type="checkbox" id="workStructure2" name="workStructure" value="مكتبي"><label for="workStructure2">مكتبي</label></div>
                         <div class="checkbox-item"><input type="checkbox" id="workStructure3" name="workStructure" value="عسكري"><label for="workStructure3">عسكري</label></div>
+                        <!-- ✅ إضافة خيار "أمني" -->
+                        <div class="checkbox-item"><input type="checkbox" id="workStructure4" name="workStructure" value="أمني"><label for="workStructure4">أمني</label></div>
                     </div>
                 </div>
             </div>
         </div>
+
         <!-- محاور الاستبيان -->
         <div class="section">
             <div class="section-title">محاور استبانة رضا الأطراف المعنية</div>
+
             <!-- القيادة والإدارة -->
             <div class="form-group">
                 <h3>أولاً: القيادة والإدارة</h3>
@@ -547,29 +551,49 @@
         return;
     }
     
-    // ============================================================
-    // دالة لجمع جميع بيانات الاستبيان (المحاور العشرة)
-    // ============================================================
-    function collectAllFormData() {
+    // دالة لجمع جميع بيانات الاستبيان وتحويلها لنظام 0/1
+    function collectFormData() {
         const formData = new FormData(form);
         const data = {};
 
-        // البيانات التعريفية
+        // ===== الأعمدة A-B: نصوص =====
         data.department = formData.get('department') || '';
-        data.jobGrade = formData.get('jobGrade') || '';
-        data.jobCategory = formData.get('jobCategory') || '';
-        data.gender = formData.get('gender') || '';
-        data.education = formData.get('education') || '';
-        data.serviceYears = formData.get('serviceYears') || '';
+        data.job_grade = formData.get('jobGrade') || '';
 
-        // بنية العمل (checkbox)
-        const workStructures = [];
-        document.querySelectorAll('input[name="workStructure"]:checked').forEach(el => {
-            workStructures.push(el.value);
+        // ===== الأعمدة C-G: الفئات الوظيفية (1 أو 0) =====
+        const jobTypes = ['قيادية/اشرافية', 'ادارية', 'فنية', 'تخصصية', 'ساندة'];
+        const selectedJob = formData.get('jobCategory') || '';
+        jobTypes.forEach((type, index) => {
+            data[`job_type_${index}`] = (selectedJob === type) ? 1 : 0;
         });
-        data.workStructure = workStructures.join(', ');
 
-        // المحاور العشرة
+        // ===== الأعمدة H-K: بنية العمل (1 أو 0) =====
+        const workTypes = ['ميداني', 'مكتبي', 'عسكري', 'أمني'];
+        workTypes.forEach((type) => {
+            const checked = document.querySelector(`input[name="workStructure"][value="${type}"]:checked`);
+            data[`work_${type}`] = checked ? 1 : 0;
+        });
+
+        // ===== الأعمدة L-O: سنوات الخدمة (1 أو 0) =====
+        const serviceYears = ['15+', '10-15', '5-10', '1-5'];
+        const selectedService = formData.get('serviceYears') || '';
+        serviceYears.forEach((year) => {
+            const key = year.replace('-', 'to');
+            data[`service_${key}`] = (selectedService === year) ? 1 : 0;
+        });
+
+        // ===== الأعمدة P-Q: الجنس (1 أو 0) =====
+        data.gender_female = (formData.get('gender') === 'أنثى') ? 1 : 0;
+        data.gender_male = (formData.get('gender') === 'ذكر') ? 1 : 0;
+
+        // ===== الأعمدة R-V: التحصيل العلمي (1 أو 0) =====
+        const eduLevels = ['دبلوم عالي', 'بكالوريوس', 'دبلوم', 'اعدادية', 'متوسطة'];
+        const selectedEdu = formData.get('education') || '';
+        eduLevels.forEach((edu, index) => {
+            data[`edu_${index}`] = (selectedEdu === edu) ? 1 : 0;
+        });
+
+        // ===== المحاور العشرة (الأعمدة W-BZ): القيم 1-5 =====
         const axes = {
             leadership: 5,
             strategy: 5,
@@ -586,26 +610,24 @@
         Object.keys(axes).forEach(axis => {
             for (let i = 1; i <= axes[axis]; i++) {
                 const val = formData.get(`${axis}${i}`);
-                data[`${axis}${i}`] = val ? parseInt(val) : null;
+                data[`${axis}${i}`] = val ? parseInt(val) : 0;
             }
         });
 
-        // الأولويات
-        data.priority1 = formData.get('priority1') || '';
-        data.priority2 = formData.get('priority2') || '';
-        data.priority3 = formData.get('priority3') || '';
-        data.priority4 = formData.get('priority4') || '';
-        data.priority5 = formData.get('priority5') || '';
+        // ===== الأعمدة CA-CE: الأولويات (القيم 1-5) =====
+        data.priority1 = parseInt(formData.get('priority1')) || 0;
+        data.priority2 = parseInt(formData.get('priority2')) || 0;
+        data.priority3 = parseInt(formData.get('priority3')) || 0;
+        data.priority4 = parseInt(formData.get('priority4')) || 0;
+        data.priority5 = parseInt(formData.get('priority5')) || 0;
 
-        // المقترحات
+        // ===== المقترحات =====
         data.suggestions = formData.get('suggestions') || '';
 
         return data;
     }
 
-    // ============================================================
     // إرسال الاستبيان
-    // ============================================================
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -641,40 +663,59 @@
         submitBtn.innerHTML = '<span class="loading-spinner"></span> جاري الإرسال...';
         
         try {
-            // ============================================================
-            // 1. جمع جميع بيانات الاستبيان
-            // ============================================================
-            const surveyData = collectAllFormData();
+            const surveyData = collectFormData();
 
-            // ============================================================
-            // 2. حفظ في جدول job_satisfaction_surveys (جميع المحاور العشرة)
-            // ============================================================
+            // حفظ في Supabase
             const { error: insertError } = await sb
                 .from('job_satisfaction_surveys')
                 .insert([{
+                    // الأعمدة A-B: نصوص
                     department: surveyData.department,
-                    job_grade: surveyData.jobGrade,
-                    job_type: surveyData.jobCategory,
-                    gender: surveyData.gender,
-                    education: surveyData.education,
-                    service_years: surveyData.serviceYears,
-                    work_structure: surveyData.workStructure,
+                    job_grade: surveyData.job_grade,
                     
-                    // القيادة والإدارة (5)
+                    // الأعمدة C-G: الفئات الوظيفية (1 أو 0)
+                    job_type_0: surveyData.job_type_0,
+                    job_type_1: surveyData.job_type_1,
+                    job_type_2: surveyData.job_type_2,
+                    job_type_3: surveyData.job_type_3,
+                    job_type_4: surveyData.job_type_4,
+                    
+                    // الأعمدة H-K: بنية العمل (1 أو 0)
+                    work_ميداني: surveyData.work_ميداني,
+                    work_مكتبي: surveyData.work_مكتبي,
+                    work_عسكري: surveyData.work_عسكري,
+                    work_أمني: surveyData.work_أمني,
+                    
+                    // الأعمدة L-O: سنوات الخدمة (1 أو 0)
+                    service_15plus: surveyData.service_15plus,
+                    service_10to15: surveyData.service_10to15,
+                    service_5to10: surveyData.service_5to10,
+                    service_1to5: surveyData.service_1to5,
+                    
+                    // الأعمدة P-Q: الجنس (1 أو 0)
+                    gender_female: surveyData.gender_female,
+                    gender_male: surveyData.gender_male,
+                    
+                    // الأعمدة R-V: التحصيل العلمي (1 أو 0)
+                    edu_0: surveyData.edu_0,
+                    edu_1: surveyData.edu_1,
+                    edu_2: surveyData.edu_2,
+                    edu_3: surveyData.edu_3,
+                    edu_4: surveyData.edu_4,
+                    
+                    // المحاور العشرة (القيم 1-5)
                     leadership1: surveyData.leadership1,
                     leadership2: surveyData.leadership2,
                     leadership3: surveyData.leadership3,
                     leadership4: surveyData.leadership4,
                     leadership5: surveyData.leadership5,
                     
-                    // التخطيط الاستراتيجي (5)
                     strategy1: surveyData.strategy1,
                     strategy2: surveyData.strategy2,
                     strategy3: surveyData.strategy3,
                     strategy4: surveyData.strategy4,
                     strategy5: surveyData.strategy5,
                     
-                    // التمكين (6)
                     empowerment1: surveyData.empowerment1,
                     empowerment2: surveyData.empowerment2,
                     empowerment3: surveyData.empowerment3,
@@ -682,14 +723,12 @@
                     empowerment5: surveyData.empowerment5,
                     empowerment6: surveyData.empowerment6,
                     
-                    // التحفيز (5)
                     motivation1: surveyData.motivation1,
                     motivation2: surveyData.motivation2,
                     motivation3: surveyData.motivation3,
                     motivation4: surveyData.motivation4,
                     motivation5: surveyData.motivation5,
                     
-                    // الولاء (6)
                     loyalty1: surveyData.loyalty1,
                     loyalty2: surveyData.loyalty2,
                     loyalty3: surveyData.loyalty3,
@@ -697,7 +736,6 @@
                     loyalty5: surveyData.loyalty5,
                     loyalty6: surveyData.loyalty6,
                     
-                    // الاستحقاق (6)
                     entitlement1: surveyData.entitlement1,
                     entitlement2: surveyData.entitlement2,
                     entitlement3: surveyData.entitlement3,
@@ -705,14 +743,12 @@
                     entitlement5: surveyData.entitlement5,
                     entitlement6: surveyData.entitlement6,
                     
-                    // التواصل (5)
                     communication1: surveyData.communication1,
                     communication2: surveyData.communication2,
                     communication3: surveyData.communication3,
                     communication4: surveyData.communication4,
                     communication5: surveyData.communication5,
                     
-                    // السلوك (8)
                     behavior1: surveyData.behavior1,
                     behavior2: surveyData.behavior2,
                     behavior3: surveyData.behavior3,
@@ -722,7 +758,6 @@
                     behavior7: surveyData.behavior7,
                     behavior8: surveyData.behavior8,
                     
-                    // السلامة (6)
                     safety1: surveyData.safety1,
                     safety2: surveyData.safety2,
                     safety3: surveyData.safety3,
@@ -730,13 +765,12 @@
                     safety5: surveyData.safety5,
                     safety6: surveyData.safety6,
                     
-                    // الجانب المعنوي (4)
                     moral1: surveyData.moral1,
                     moral2: surveyData.moral2,
                     moral3: surveyData.moral3,
                     moral4: surveyData.moral4,
                     
-                    // الأولويات
+                    // الأعمدة CA-CE: الأولويات (القيم 1-5)
                     priority1: surveyData.priority1,
                     priority2: surveyData.priority2,
                     priority3: surveyData.priority3,
@@ -751,9 +785,7 @@
 
             if (insertError) throw insertError;
 
-            // ============================================================
-            // 3. تحديث جدول الإحصائيات
-            // ============================================================
+            // تحديث جدول الإحصائيات
             const { data: existing, error: searchError } = await sb
                 .from('الإحصائيات')
                 .select('*')
@@ -790,9 +822,7 @@
         }
     });
     
-    // ============================================================
     // مسح البيانات
-    // ============================================================
     clearBtn.addEventListener('click', function() {
         if (confirm('⚠️ هل أنت متأكد من مسح جميع البيانات؟')) {
             form.reset();
@@ -805,9 +835,7 @@
         }
     });
     
-    // ============================================================
     // التحقق من صيغة الدرجة الوظيفية
-    // ============================================================
     document.getElementById('jobGrade').addEventListener('input', function(e) {
         const errorMsg = document.getElementById('jobGradeError');
         if (e.target.value && !/^[0-9]+\\[0-9]+$/.test(e.target.value)) {
