@@ -585,9 +585,9 @@ serviceYears.forEach((year) => {
     data[key] = (selectedService === year) ? 1 : 0;
 }); 
         // ===== الجنس (1 أو 0) =====
-        data.gender_female = (formData.get('gender') === 'أنثى') ? 1 : 0;
-        data.gender_male = (formData.get('gender') === 'ذكر') ? 1 : 0;
-
+        // ===== الجنس (1 أو 0) =====
+       data.انثى = (formData.get('gender') === 'أنثى') ? 1 : 0;
+       data.ذكر = (formData.get('gender') === 'ذكر') ? 1 : 0;
         // ===== التحصيل العلمي (1 أو 0) =====
         const eduLevels = ['دبلوم عالي', 'بكالوريوس', 'دبلوم', 'اعدادية', 'متوسطة'];
         const selectedEdu = formData.get('education') || '';
