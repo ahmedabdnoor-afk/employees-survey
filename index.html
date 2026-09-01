@@ -572,22 +572,10 @@
             data[`work_${type}`] = checked ? 1 : 0;
         });
 
-        // ===== سنوات الخدمة (1 أو 0) =====
-       // ===== سنوات الخدمة (1 أو 0) =====
-const serviceYears = ['15+', '10-15', '5-10', '1-5'];
-const selectedService = formData.get('serviceYears') || '';
-serviceYears.forEach((year) => {
-    let key;
-    if (year === '15+') key = 'من_15_سنة_فما_فوق';
-    else if (year === '10-15') key = 'من_10_الى_15_سنة';
-    else if (year === '5-10') key = 'من_5_الى_10_سنوات';
-    else if (year === '1-5') key = 'اقل_من_5_سنوات';
-    data[key] = (selectedService === year) ? 1 : 0;
-}); 
-        // ===== الجنس (1 أو 0) =====
-        // ===== الجنس (1 أو 0) =====
-       data.انثى = (formData.get('gender') === 'أنثى') ? 1 : 0;
-       data.ذكر = (formData.get('gender') === 'ذكر') ? 1 : 0;
+       // ===== سنوات الخدمة (نص) =====
+data.سنوات_الخدمة = formData.get('serviceYears') || '';
+        // ===== الجنس (نص) =====
+data.الجنس = formData.get('gender') || '';
        // ===== التحصيل العلمي (نص) =====
 data.education = formData.get('education') || '';
 
