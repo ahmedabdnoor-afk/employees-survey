@@ -558,12 +558,8 @@
         data.department = formData.get('department') || '';
         data.job_grade = formData.get('jobGrade') || '';
 
-        // ===== الفئات الوظيفية (1 أو 0) =====
-        const jobTypes = ['قيادية/اشرافية', 'ادارية', 'فنية', 'تخصصية', 'ساندة'];
-        const selectedJob = formData.get('jobCategory') || '';
-        jobTypes.forEach((type, index) => {
-            data[`job_type_${index}`] = (selectedJob === type) ? 1 : 0;
-        });
+     // ===== الفئة الوظيفية (نص - اختيار واحد من قائمة منسدلة) =====
+data.الفئة_الوظيفية = formData.get('jobCategory') || '';
 
         // ===== بنية العمل (1 أو 0) =====
         const workTypes = ['ميداني', 'مكتبي', 'عسكري', 'أمني'];
@@ -715,12 +711,8 @@ data.التحصيل_العلمي = formData.get('education') || '';
                     اسم_التشكيل: surveyData.department,
                     الدرجة_الوظيفية: surveyData.job_grade,
                     
-                    // الفئات الوظيفية
-                    وظيفة_قيادية: surveyData.job_type_0,
-                    وظيفة_ادارية: surveyData.job_type_1,
-                    وظيفة_فنية: surveyData.job_type_2,
-                    وظيفة_تخصصية: surveyData.job_type_3,
-                    وظيفة_ساندة: surveyData.job_type_4,
+                   // الفئة الوظيفية (نص)
+الفئة_الوظيفية: surveyData.الفئة_الوظيفية,
                     
                     // بنية العمل
                     ميداني: surveyData.work_ميداني,
